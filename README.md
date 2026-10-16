@@ -15,9 +15,7 @@
 7. [Getting Started](#getting-started)
 8. [Environment Variables](#environment-variables)
 9. [Development Roadmap](#development-roadmap)
-10. [Current Project Status](#current-project-status)
-11. [Contributing](#contributing)
-12. [License](#license)
+10. [Contributing](#contributing)
 
 ---
 
@@ -178,13 +176,6 @@ The roadmap below outlines the planned phases of development. No phase has been 
 
 ---
 
-## Current Project Status
-
-**Status: Pre-development**
-
-Sidra is currently in the planning and design phase. The repository has been initialized and the project concept, technology stack, and feature set have been defined. No application code has been written, no packages have been installed, and the application has not been deployed.
-
----
 
 ## Contributing
 
@@ -192,6 +183,3 @@ Contribution guidelines have not yet been established. This section will be upda
 
 ---
 
-## License
-
-A license has not yet been selected for this project. This section will be updated before the first public release.
