@@ -12,12 +12,13 @@
 4. [Technology Stack](#technology-stack)
 5. [Design Direction](#design-direction)
 6. [Proposed Project Structure](#proposed-project-structure)
-7. [Getting Started](#getting-started)
-8. [Environment Variables](#environment-variables)
-9. [Development Roadmap](#development-roadmap)
-10. [Current Project Status](#current-project-status)
-11. [Contributing](#contributing)
-12. [License](#license)
+7. [Documentation](#documentation)
+8. [Getting Started](#getting-started)
+9. [Environment Variables](#environment-variables)
+10. [Development Roadmap](#development-roadmap)
+11. [Current Project Status](#current-project-status)
+12. [Contributing](#contributing)
+13. [License](#license)
 
 ---
 
@@ -115,6 +116,18 @@ sidra/
 ├── .gitignore
 └── README.md
 ```
+
+---
+
+## Documentation
+
+Detailed documentation for the project lives in the [`docs/`](./docs) folder.
+
+| Document | Description |
+|---|---|
+| [Project Specification](./docs/PROJECT_SPECIFICATION.md) | Purpose, user roles, planned features, functional and non-functional requirements, security, accessibility, and acceptance criteria |
+| [UI/UX Design](./docs/UI_UX_DESIGN.md) | Color palette, typography, layout direction, page designs, responsive behavior, and accessibility guidelines |
+| [System Architecture](./docs/SYSTEM_ARCHITECTURE.md) | Planned PERN stack architecture, layer responsibilities, folder structure, authentication, validation, error handling, and testing strategy |
 
 ---
 
