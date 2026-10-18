@@ -56,11 +56,18 @@ A future where every family feels informed, supported, and included throughout t
 | Courses catalog page | ✅ Implemented |
 | Course detail pages | ✅ Implemented |
 | Demo course data (8 courses) | ✅ Complete |
+| Login page | ✅ Implemented (frontend only) |
+| Register page with family role selection | ✅ Implemented (frontend only) |
+| Profile page with view and edit mode | ✅ Implemented (frontend only) |
+| Role-based circular avatar | ✅ Implemented |
+| Bilingual navbar with logo | ✅ Implemented |
+| Social media icons in footer | ✅ Implemented |
+| Frontend auth state (sessionStorage) | ✅ Implemented (dev simulation) |
 | Responsive design | ✅ Implemented |
 | Express backend foundation | ✅ Scaffolded (not yet functional) |
 | API health-check endpoint | ✅ Ready to test |
 | PostgreSQL database | 🔲 Pending |
-| Authentication (JWT) | 🔲 Pending |
+| Authentication (JWT) — real backend | 🔲 Pending |
 | Real API endpoints | 🔲 Stubs only (501) |
 | Payment integration | 🔲 Pending |
 | Professional directory page | 🔲 Placeholder |
@@ -93,10 +100,12 @@ Sidra/
 ├── client/                          # React frontend (Vite)
 │   ├── public/
 │   ├── src/
-│   │   ├── assets/                  # Images and static files
-│   │   │   └── Capture.PNG          # Hero image
+│   │   ├── assets/
+│   │   │   ├── logo.jpg             # Sidra brand logo (used in Navbar)
+│   │   │   └── Capture.PNG          # Hero section image
 │   │   ├── components/
-│   │   │   ├── common/              # Shared UI components (reserved)
+│   │   │   ├── common/
+│   │   │   │   └── RoleAvatar.jsx   # Role-based circular avatar (4 roles + fallback)
 │   │   │   ├── courses/             # Course-specific components
 │   │   │   │   ├── ActiveFilters.jsx
 │   │   │   │   ├── CategoryFilter.jsx
@@ -113,10 +122,11 @@ Sidra/
 │   │   │   │   ├── Hero.jsx
 │   │   │   │   ├── HowItWorks.jsx
 │   │   │   │   └── ProfessionalPreview.jsx
-│   │   │   └── layout/              # Shared layout components
-│   │   │       ├── Footer.jsx
-│   │   │       └── Navbar.jsx
-│   │   ├── context/                 # React Context providers (reserved)
+│   │   │   └── layout/
+│   │   │       ├── Footer.jsx       # Footer with nav, legal, social media icons
+│   │   │       └── Navbar.jsx       # Sticky navbar — logo, bilingual name, auth-aware
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx      # Auth state, FAMILY_ROLES, register/login/logout
 │   │   ├── data/
 │   │   │   └── courses.js           # 8 demo courses — edit here
 │   │   ├── hooks/                   # Custom React hooks (reserved)
@@ -124,15 +134,18 @@ Sidra/
 │   │   │   ├── CourseDetailPage.jsx # ✅ Implemented
 │   │   │   ├── CoursesPage.jsx      # ✅ Implemented
 │   │   │   ├── HomePage.jsx         # ✅ Implemented
+│   │   │   ├── LoginPage.jsx        # ✅ Implemented (frontend only)
 │   │   │   ├── NotFoundPage.jsx
-│   │   │   └── PlaceholderPage.jsx
+│   │   │   ├── PlaceholderPage.jsx
+│   │   │   ├── ProfilePage.jsx      # ✅ Implemented (frontend only)
+│   │   │   └── RegisterPage.jsx     # ✅ Implemented (frontend only)
 │   │   ├── routes/
-│   │   │   └── AppRoutes.jsx        # React Router configuration
-│   │   ├── services/                # API call functions (reserved)
+│   │   │   └── AppRoutes.jsx        # React Router — includes ProtectedRoute
+│   │   ├── services/                # API call functions (reserved for backend connection)
 │   │   ├── styles/
 │   │   │   └── index.css            # Tailwind directives + global styles
 │   │   ├── App.jsx
-│   │   └── main.jsx
+│   │   └── main.jsx                 # App root — wrapped with AuthProvider
 │   ├── index.html
 │   ├── package.json
 │   ├── postcss.config.js
@@ -219,12 +232,15 @@ npm run preview
 | `/` | Homepage | ✅ Implemented |
 | `/courses` | Course catalog | ✅ Implemented |
 | `/courses/:id` | Course detail (1–8) | ✅ Implemented |
+| `/login` | Login | ✅ Implemented (frontend only) |
+| `/register` | Register with family role | ✅ Implemented (frontend only) |
+| `/profile` | User profile — protected route | ✅ Implemented (frontend only) |
 | `/professionals` | Professional directory | 🔲 Placeholder |
 | `/about` | About page | 🔲 Placeholder |
-| `/login` | Login | 🔲 Placeholder |
-| `/register` | Register | 🔲 Placeholder |
 
 > The frontend runs independently of the backend. No server or database is needed to view the homepage and Courses pages.
+>
+> Login and Register work as a frontend simulation using `sessionStorage`. No real backend authentication is connected yet. See [Implemented Features — Authentication](#authentication-frontend-simulation) for details.
 
 ---
 
@@ -254,7 +270,6 @@ The API will be available at **http://localhost:5000**
 **Verify the server is running:**
 
 ```bash
-# In your browser or with curl:
 curl http://localhost:5000/api/health
 ```
 
@@ -309,13 +324,27 @@ cp .env.example .env
 The following features are complete and working in the current build.
 
 ### Homepage (`/`)
-- Responsive navigation bar with mobile hamburger menu
-- Hero section with Amharic slogan and family image
+- Sticky responsive navbar with logo, bilingual brand name (Sidra / ስድራ), and mobile hamburger menu
+- Hero section with Amharic slogan and family image (`Capture.PNG`)
 - "How Sidra Supports Families" section (4 feature highlights)
 - Featured courses preview (3 cards)
 - Professional directory preview (3 sample cards)
 - Call-to-action section
-- Footer with navigation and legal links
+- Footer with navigation links, legal links, and social media icons
+
+### Navbar
+- Sidra logo (`logo.jpg`) displayed at the far left
+- Bilingual brand name — "Sidra" in charcoal and "ስድራ" in terracotta — beside the logo
+- Navigation links: Home, Courses, Professionals, About
+- Auth-aware controls: shows Login + Register when guest; shows Log Out when authenticated
+- Circular role-based profile avatar at the far right — links to `/profile` when authenticated, `/login` when not
+- Fully responsive with mobile hamburger drawer
+
+### Footer
+- Brand name, mission statement, navigation links, and legal links
+- Social media icons: Instagram, Facebook, TikTok, YouTube, Telegram
+- Icons link to the respective platform homepages as temporary links
+- To update with Sidra's real account URLs, edit the `SOCIAL_LINKS` array at the top of `client/src/components/layout/Footer.jsx`
 
 ### Course Catalog (`/courses`)
 - Page introduction with search field
@@ -333,11 +362,31 @@ The following features are complete and working in the current build.
 - Course header with category, level, format, and duration metadata
 - Enrolment card with ETB pricing
 - Video lesson placeholder
-- Learning objectives
-- Intended audience
+- Learning objectives and intended audience
 - Accordion curriculum (modules and lessons)
 - External learning resources (links to WHO, CDC, AAP, UNICEF, NHS, etc.)
 - Payment modal (demonstration UI — no real payment processed)
+
+### Authentication (Frontend Simulation)
+
+> ⚠ This is a frontend-only development simulation. No real backend authentication is connected. Passwords are never stored. Sessions are held in `sessionStorage` and cleared when the browser tab is closed.
+
+- **Login page (`/login`)** — email and password form with validation and a dev-mode notice
+- **Register page (`/register`)** — full name, email, password, confirm password, and family role selection
+- **Family role selection** — four illustrated role cards: Mother, Father, Legal Guardian, Other Caregiver
+- **Profile page (`/profile`)** — protected route; redirects to `/login` if not authenticated
+  - View mode: role-based avatar, full name, email, family role badge
+  - Edit mode: editable name and role selector; email is read-only
+  - Save Changes / Cancel / Log Out
+- **`AuthContext`** — provides `user`, `register()`, `login()`, `updateProfile()`, `logout()` to the whole app
+- When the backend is ready, replace the three simulation functions in `AuthContext.jsx` with real API calls
+
+### Role-Based Avatars (`RoleAvatar`)
+- Reusable component at `client/src/components/common/RoleAvatar.jsx`
+- Distinct inline SVG illustration for each family role, using the Sidra colour palette
+- Fallback avatar for users with no role set
+- Used in the Navbar (42 px) and Profile page (80 px)
+- Avatar updates immediately when a user changes their role in the Profile edit form
 
 ### Design System
 - Cream, terracotta, sage green, charcoal colour palette
@@ -354,14 +403,17 @@ The following features are planned and have not yet been implemented.
 
 | Feature | Notes |
 |---|---|
-| User registration and login | Requires JWT auth + PostgreSQL |
+| Real backend authentication (JWT) | Replace `AuthContext` simulation with real `POST /api/auth/register` and `POST /api/auth/login` |
+| PostgreSQL database | Users table needs `name`, `email`, `password_hash`, `family_role`, `created_at` |
+| Persistent profile data | Currently session-only; requires backend `GET /api/auth/me` and `PUT /api/auth/me` |
 | Course enrolment | Requires authentication |
 | Learning progress tracking | Requires database |
-| Professional directory | Frontend placeholder exists |
+| Professional directory | Frontend placeholder exists at `/professionals` |
 | Professional profiles | Requires database + admin verification |
 | Admin dashboard | Requires auth + role-based access control |
-| Payment integration (Telebirr, Chapa) | Requires backend + provider APIs |
+| Payment integration (Telebirr, Chapa) | Requires backend + official provider APIs |
 | Real course data from API | Currently served from static `client/src/data/courses.js` |
+| Sidra social media accounts | Add real profile URLs to `SOCIAL_LINKS` in `Footer.jsx` when accounts are created |
 
 ---
 
@@ -380,7 +432,7 @@ The visual identity of Sidra is warm, welcoming, professional, and inclusive.
 | Warm gray | `#77716C` | Secondary text, captions |
 | Border | `#E8DED3` | Borders, dividers |
 
-Temporary branding: **Sidra | ስድራ** (logo not yet finalised)
+**Branding:** The Sidra logo (`client/src/assets/logo.jpg`) is displayed in the navbar alongside the bilingual text name "Sidra / ስድራ".
 
 ---
 
@@ -405,13 +457,14 @@ Detailed documentation lives in the [`docs/`](./docs) folder.
 | 3 | Homepage implementation | ✅ Complete |
 | 4 | Courses page — catalog, filtering, detail pages | ✅ Complete |
 | 5 | Backend foundation — Express server scaffold | ✅ Complete |
-| 6 | Database schema design and PostgreSQL setup | 🔲 Next |
-| 7 | Backend API — authentication and user management | 🔲 Planned |
-| 8 | Connect frontend to real API (replace static data) | 🔲 Planned |
-| 9 | Professional directory | 🔲 Planned |
-| 10 | Admin dashboard | 🔲 Planned |
-| 11 | Payment integration (Telebirr, Chapa) | 🔲 Planned |
-| 12 | Testing, accessibility review, and production deployment | 🔲 Planned |
+| 6 | Auth UI — Login, Register, Profile pages, role-based avatars | ✅ Complete (frontend simulation) |
+| 7 | Database schema design and PostgreSQL setup | 🔲 Next |
+| 8 | Backend API — real authentication and user management | 🔲 Planned |
+| 9 | Connect frontend to real API (replace static data and auth simulation) | 🔲 Planned |
+| 10 | Professional directory | 🔲 Planned |
+| 11 | Admin dashboard | 🔲 Planned |
+| 12 | Payment integration (Telebirr, Chapa) | 🔲 Planned |
+| 13 | Testing, accessibility review, and production deployment | 🔲 Planned |
 
 ---
 

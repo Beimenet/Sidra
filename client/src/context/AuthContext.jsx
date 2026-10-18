@@ -146,16 +146,23 @@ export function AuthProvider({ children }) {
    * Frontend-only simulation. Accepts any non-empty email + password and
    * creates a temporary dev session. NO credentials are stored.
    *
+   * ADMIN DEV SHORTCUT: if the email contains "admin", the session gets
+   * isAdmin: true so you can test the Admin Dashboard without a backend.
+   * This is a development convenience ONLY — it provides no real security.
+   *
    * When the backend is ready, replace this with a real POST /api/auth/login.
    */
   async function login({ email, password: _password }) {
     await new Promise((r) => setTimeout(r, 600))
+
+    const isAdmin = email.toLowerCase().includes('admin')
 
     const profile = {
       id: `dev-${Date.now()}`,
       name: email.split('@')[0],
       email: email.trim().toLowerCase(),
       familyRole: null,
+      isAdmin,
       createdAt: new Date().toISOString(),
       _devOnly: true,
     }
@@ -175,7 +182,7 @@ export function AuthProvider({ children }) {
     if (!user) throw new Error('Not authenticated.')
 
     const allowed = {}
-    if (updates.name !== undefined)       allowed.name = updates.name.trim()
+    if (updates.name !== undefined) allowed.name = updates.name.trim()
     if (updates.familyRole !== undefined) {
       if (!ALLOWED_ROLE_VALUES.includes(updates.familyRole)) {
         throw new Error('Invalid family role.')
