@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-cream text-charcoal font-sans antialiased;
+  }
+
+  /* Visible focus ring for keyboard navigation */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-terracotta ring-offset-2;
+  }
+}
+
+@layer components {
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-terracotta text-white font-semibold rounded-lg
+           hover:bg-terracotta-hover focus-visible:ring-2 focus-visible:ring-terracotta focus-visible:ring-offset-2
+           transition-colors duration-200;
+  }
+
+  /* Secondary / outline button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 border-2 border-terracotta text-terracotta font-semibold rounded-lg
+           hover:bg-terracotta hover:text-white focus-visible:ring-2 focus-visible:ring-terracotta focus-visible:ring-offset-2
+           transition-colors duration-200;
+  }
+
+  /* White card */
+  .card {
+    @apply bg-white rounded-xl border border-border shadow-sm;
+  }
+
+  /* Sage green category tag */
+  .tag {
+    @apply inline-block px-3 py-1 bg-sage/20 text-charcoal text-sm font-medium rounded-full;
+  }
+
+  /* Section container */
+  .section-container {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
