@@ -168,3 +168,26 @@ CREATE TABLE IF NOT EXISTS lesson_progress (
 
 CREATE INDEX IF NOT EXISTS idx_lesson_progress_user_id   ON lesson_progress (user_id);
 CREATE INDEX IF NOT EXISTS idx_lesson_progress_lesson_id ON lesson_progress (lesson_id);
+
+
+-- ────────────────────────────────────────────────────────────
+-- 7. sessions
+--    Server-managed session store.
+--    The `sid` HttpOnly cookie holds the session id only —
+--    no user data or secrets are ever stored in the cookie.
+--
+--    Session IDs are 64-character hex strings generated with
+--    crypto.randomBytes(32) — 256 bits of entropy.
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS sessions (
+    id            TEXT        PRIMARY KEY,
+    user_id       UUID        NOT NULL
+                              REFERENCES users(id) ON DELETE CASCADE,
+    expires_at    TIMESTAMPTZ NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    ip_address    TEXT,
+    user_agent    TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions (user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions (expires_at);

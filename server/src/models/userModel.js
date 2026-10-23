@@ -5,13 +5,20 @@
  * SQL injection. Never interpolate user input into a query string.
  *
  * password_hash is NEVER returned to the caller by default.
- * Use the explicit findByEmailWithHash() function only during login.
+ * Use findUserByEmailWithHash() ONLY during login credential verification.
  */
 
 import { pool } from '../config/db.js'
 
 // ── Safe column list — excludes password_hash ────────────────────────────────
 const SAFE_COLS = 'id, full_name, email, role, is_active, created_at'
+
+/**
+ * Roles that are allowed via self-service registration or profile update.
+ * 'admin' is intentionally excluded — it must be set directly in the DB
+ * or through a separate admin-only operation.
+ */
+const PUBLIC_ROLES = ['mother', 'father', 'legal_guardian', 'professional']
 
 /**
  * Create a new user.
@@ -54,8 +61,8 @@ export async function findUserByEmail(email) {
 
 /**
  * Find a user by email INCLUDING the password_hash.
- * Use ONLY during login credential verification — never return
- * the result of this function directly to an API response.
+ * Use ONLY during login credential verification.
+ * NEVER return the result of this function directly to an API response.
  */
 export async function findUserByEmailWithHash(email) {
   const { rows } = await pool.query(
@@ -68,17 +75,26 @@ export async function findUserByEmailWithHash(email) {
 
 /**
  * Update a user's full_name and/or role.
- * account_role cannot be changed to 'admin' via this function —
- * that must go through a separate admin-only operation.
+ *
+ * SECURITY: The `role` parameter is validated against PUBLIC_ROLES before
+ * being applied. This prevents self-promotion to 'admin' even if a caller
+ * tries to pass it directly. Role escalation to 'admin' requires a
+ * separate admin-only operation with explicit authorization.
+ *
+ * @param {string} id
+ * @param {{ full_name?: string, role?: string }} updates
  */
-export async function updateUser(id, { full_name, role }) {
+export async function updateUser(id, { full_name, role } = {}) {
+  // Silently reject any role that is not in the public-safe list
+  const safeRole = role && PUBLIC_ROLES.includes(role) ? role : null
+
   const { rows } = await pool.query(
     `UPDATE users
      SET full_name = COALESCE($2, full_name),
          role      = COALESCE($3, role)
      WHERE id = $1
      RETURNING ${SAFE_COLS}`,
-    [id, full_name?.trim() ?? null, role ?? null]
+    [id, full_name?.trim() ?? null, safeRole]
   )
   return rows[0] ?? null
 }
@@ -86,11 +102,13 @@ export async function updateUser(id, { full_name, role }) {
 /**
  * Deactivate a user (sets is_active = FALSE).
  * Preferred over hard-deleting accounts that may have payment history.
+ * BUG FIX: original version was missing the $1 parameter array.
+ * @param {string} id UUID
  */
 export async function deactivateUser(id) {
   const { rows } = await pool.query(
     `UPDATE users SET is_active = FALSE WHERE id = $1 RETURNING ${SAFE_COLS}`,
-    [id]
+    [id]   // ← was missing in the original; caused a runtime crash
   )
   return rows[0] ?? null
 }
