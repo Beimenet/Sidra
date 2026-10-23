@@ -469,8 +469,105 @@ Detailed documentation lives in the [`docs/`](./docs) folder.
 ---
 
 ## Contributing
+## 👥 Team Members and Task Division
 
-Contribution guidelines have not yet been established. This section will be updated as the project matures and opens to collaboration.
+The development of **Sidra (ስድራ) — Parenting Education Platform** is carried out collaboratively by two developers: **Beimenet** and **Amanuel**.
+
+Tasks are divided across project setup, frontend development, backend development, database management, and testing to ensure efficient teamwork and clear responsibilities.
+
+### 👩‍💻 Developer 1: Beimenet
+**Role: Project Setup, Frontend & Backend Developer**
+
+**Project Setup and Configuration**
+- Initialize and configure the project structure and development environment.
+- Set up the React frontend and Node.js/Express backend.
+- Configure the PostgreSQL database and database connection.
+- Set up the GitHub repository and version control.
+- Manage database schemas, migrations, and environment configurations.
+- Coordinate overall project structure and integration.
+
+**Frontend Development**
+- Design and develop the Home page.
+- Develop the Courses page and course browsing interface.
+- Design and implement the Admin Dashboard.
+- Work on frontend authentication integration and user-related interfaces.
+- Ensure responsive layouts and consistent UI styling across assigned pages.
+
+**Backend Development**
+- Implement user registration, login, and logout.
+- Develop authentication and session management.
+- Implement password hashing and role-based authorization.
+- Develop user profile management functionality.
+- Implement admin APIs for user and account management.
+- Develop admin dashboard statistics and reporting endpoints.
+- Test authentication, user management, and admin-related APIs.
+
+### 👨‍💻 Developer 2: Amanuel
+**Role: Frontend & Backend Developer**
+
+**Frontend Development**
+- Design and develop the Professionals page.
+- Develop the About Us page.
+- Implement other assigned informational and supporting pages.
+- Ensure responsive design and consistent styling.
+- Connect assigned frontend components to backend APIs.
+
+**Backend Development**
+- Implement course management APIs (CRUD operations).
+- Develop lesson management functionality.
+- Implement course enrollment and progress tracking.
+- Develop professional profile and directory APIs.
+- Implement professional application and verification-related functionality.
+- Integrate assigned backend modules with PostgreSQL.
+- Test course, lesson, enrollment, and professional-related APIs.
+
+### 🤝 Shared Responsibilities
+
+Both developers collaborate on:
+- Frontend and backend integration.
+- API design and database relationships.
+- Debugging and resolving technical issues.
+- Code testing and quality assurance.
+- Maintaining consistent UI/UX design.
+- GitHub collaboration and version control.
+- Project documentation and deployment preparation.
+
+### 🛠️ Technology Stack
+
+| Component | Technologies |
+|---|---|
+| Frontend | React.js, Tailwind CSS |
+| Backend | Node.js, Express.js |
+| Database | PostgreSQL |
+| Authentication | Database-backed sessions, HttpOnly cookies, bcrypt |
+| Version Control | Git, GitHub |
+| Development Tools | VS Code, Kiro |
+
+### 📋 Task Distribution Summary
+
+| Task / Module | Assigned Developer |
+|---|---|
+| Project initialization and configuration | Beimenet |
+| Database setup and migrations | Beimenet |
+| Home page | Beimenet |
+| Courses page (frontend) | Beimenet |
+| Admin Dashboard (frontend) | Beimenet |
+| Authentication and user management | Beimenet |
+| Admin backend APIs | Beimenet |
+| Professionals page | Amanuel |
+| About Us page | Amanuel |
+| Other assigned informational pages | Amanuel |
+| Course and lesson backend APIs | Amanuel |
+| Enrollment and progress tracking | Amanuel |
+| Professional services backend APIs | Amanuel |
+| Testing and integration | Both |
+| Documentation and deployment | Both |
+
+### 🔄 Collaboration Workflow
+
+Both developers work collaboratively using the project's GitHub repository. Tasks are assigned based on specific frontend pages and backend modules to minimize overlapping changes.
+
+Development work is coordinated through the shared `main` branch, with regular synchronization, testing, and integration to maintain a stable and functional application.
 
 ---
 
