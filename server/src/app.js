@@ -1,34 +1,34 @@
 /**
  * app.js — Sidra Express server entry point
  *
- * Starts the REST API server for the Sidra parenting education platform.
- *
  * Current state:
  *   ✅  Server starts and responds to health-check requests
  *   ✅  CORS configured for the React frontend
  *   ✅  Centralised error handling
- *   🔲  Database (PostgreSQL) — not yet connected
- *   🔲  Authentication (JWT) — not yet implemented
+ *   ✅  PostgreSQL connection pool configured (pg)
+ *   🔲  Database migrations — not yet run
+ *   🔲  Authentication — not yet implemented
  *   🔲  Course / professional / enrollment endpoints — stubs only (501)
  */
 
 import express from 'express'
 import cors from 'cors'
 import { env } from './config/env.js'
+import { testConnection } from './config/db.js'
 
 // Route handlers
-import healthRouter       from './routes/health.js'
-import authRouter         from './routes/auth.js'
-import coursesRouter      from './routes/courses.js'
+import healthRouter from './routes/health.js'
+import authRouter from './routes/auth.js'
+import coursesRouter from './routes/courses.js'
 import professionalsRouter from './routes/professionals.js'
 
 // Middleware
-import { notFound }    from './middleware/notFound.js'
+import { notFound } from './middleware/notFound.js'
 import { errorHandler } from './middleware/errorHandler.js'
 
 const app = express()
 
-// ── Global middleware ──────────────────────────────────────────────────────────
+// ── Global middleware ─────────────────────────────────────────────────────────
 
 app.use(cors({
   origin: env.CLIENT_ORIGIN,
@@ -40,9 +40,9 @@ app.use(express.urlencoded({ extended: true }))
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 
-app.use('/api/health',        healthRouter)
-app.use('/api/auth',          authRouter)
-app.use('/api/courses',       coursesRouter)
+app.use('/api/health', healthRouter)
+app.use('/api/auth', authRouter)
+app.use('/api/courses', coursesRouter)
 app.use('/api/professionals', professionalsRouter)
 
 // ── 404 + error handling ──────────────────────────────────────────────────────
@@ -55,7 +55,15 @@ app.use(errorHandler)
 
 const PORT = Number(env.PORT)
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  // Test the database connection on startup so problems are visible immediately
+  let dbStatus = 'connected ✅'
+  try {
+    await testConnection()
+  } catch (err) {
+    dbStatus = `FAILED ❌  ${err.message}`
+  }
+
   console.log(`
 ╔══════════════════════════════════════════════╗
 ║          Sidra API Server — Running          ║
@@ -63,8 +71,9 @@ app.listen(PORT, () => {
 ║  Environment : ${env.NODE_ENV.padEnd(28)}║
 ║  Port        : ${String(PORT).padEnd(28)}║
 ║  Health check: http://localhost:${PORT}/api/health  ║
-║  Database    : Not connected (pending)       ║
+║  Database    : ${env.DB_NAME.padEnd(28)}║
 ╚══════════════════════════════════════════════╝
+  DB connection: ${dbStatus}
   `.trim())
 })
 
