@@ -46,8 +46,8 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [menuOpen])
 
-  function handleLogout() {
-    logout()
+  async function handleLogout() {
+    await logout()
     navigate('/')
     setMenuOpen(false)
   }
@@ -153,7 +153,7 @@ export default function Navbar() {
             className="ml-1 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta focus-visible:ring-offset-2 hover:opacity-90 transition-opacity duration-150"
           >
             <RoleAvatar
-              role={user?.familyRole ?? null}
+              role={user?.role ?? null}
               size={42}
             />
           </Link>
@@ -167,7 +167,7 @@ export default function Navbar() {
             aria-label={profileLabel}
             className="rounded-full focus-visible:ring-2 focus-visible:ring-terracotta focus-visible:ring-offset-1"
           >
-            <RoleAvatar role={user?.familyRole ?? null} size={36} />
+            <RoleAvatar role={user?.role ?? null} size={36} />
           </Link>
 
           <button
@@ -219,7 +219,7 @@ export default function Navbar() {
                     className="flex items-center gap-3 px-4 py-3 text-charcoal font-medium hover:text-terracotta hover:bg-cream rounded-lg transition-colors"
                     onClick={() => setMenuOpen(false)}
                   >
-                    <RoleAvatar role={user.familyRole ?? null} size={34} />
+                    <RoleAvatar role={user.role ?? null} size={34} />
                     <div className="flex flex-col leading-tight">
                       <span className="text-sm font-semibold">{user.name}</span>
                       <span className="text-xs text-warm-gray">My Profile</span>

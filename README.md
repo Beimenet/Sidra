@@ -66,7 +66,8 @@ A future where every family feels informed, supported, and included throughout t
 | Responsive design | ✅ Implemented |
 | Express backend foundation | ✅ Scaffolded (not yet functional) |
 | API health-check endpoint | ✅ Ready to test |
-| PostgreSQL database | 🔲 Pending |
+| PostgreSQL connection (pg) | ✅ Connected to sidra_db |
+| Database schema (6 tables) | ✅ Applied to sidra_db |
 | Authentication (JWT) — real backend | 🔲 Pending |
 | Real API endpoints | 🔲 Stubs only (501) |
 | Payment integration | 🔲 Pending |
@@ -81,7 +82,7 @@ Sidra is being built on the **PERN** stack.
 
 | Layer | Technology | Version | Status |
 |---|---|---|---|
-| Database | PostgreSQL | Latest stable | Pending setup |
+| Database | PostgreSQL | 18.x | ✅ Connected — sidra_db |
 | Backend runtime | Node.js | v18 LTS or later | Scaffolded |
 | Backend framework | Express.js | v4.x | Scaffolded |
 | Frontend library | React.js | v18.3 | ✅ Running |
@@ -155,17 +156,28 @@ Sidra/
 ├── server/                          # Node.js + Express backend
 │   ├── src/
 │   │   ├── config/
-│   │   │   ├── db.js                # PostgreSQL setup (pending)
+│   │   │   ├── db.js                # PostgreSQL connection pool (pg) ✅ connected
 │   │   │   └── env.js               # Centralised environment variables
+│   │   ├── db/
+│   │   │   ├── schema.sql           # ✅ Full schema — 6 tables
+│   │   │   └── migrate.js           # ✅ Idempotent migration script
 │   │   ├── middleware/
 │   │   │   ├── errorHandler.js      # Centralised error handling
 │   │   │   └── notFound.js          # 404 handler
+│   │   ├── models/                  # Database query functions (one per table)
+│   │   │   ├── userModel.js
+│   │   │   ├── professionalProfileModel.js
+│   │   │   ├── courseModel.js
+│   │   │   ├── lessonModel.js
+│   │   │   ├── enrollmentModel.js
+│   │   │   └── lessonProgressModel.js
 │   │   ├── routes/
 │   │   │   ├── auth.js              # Auth routes (stubs — 501)
 │   │   │   ├── courses.js           # Course routes (stubs — 501)
-│   │   │   ├── health.js            # GET /api/health ✅ works
+│   │   │   ├── health.js            # GET /api/health ✅ works + DB ping
 │   │   │   └── professionals.js     # Professional routes (stubs — 501)
 │   │   └── app.js                   # Server entry point
+│   ├── .env                         # Local credentials — never committed
 │   ├── .env.example                 # Environment variable template
 │   ├── .gitignore
 │   └── package.json
@@ -259,9 +271,12 @@ npm install
 
 # 3. Create your local environment file
 cp .env.example .env
-# Then open .env and fill in values as needed
+# Then open .env and fill in your PostgreSQL credentials
 
-# 4. Start the development server (with file watching)
+# 4. Apply the database schema (first time, or after schema changes)
+npm run migrate
+
+# 5. Start the development server (with file watching)
 npm run dev
 ```
 
@@ -279,13 +294,16 @@ Expected response:
   "status": "ok",
   "service": "sidra-api",
   "environment": "development",
-  "database": "not connected — PostgreSQL integration pending"
+  "database": { "status": "connected", "name": "sidra_db" }
 }
 ```
 
 **Other backend commands:**
 
 ```bash
+# Apply the database schema (idempotent — safe to run multiple times)
+npm run migrate
+
 # Start without file watching (production-style)
 npm run start
 ```
@@ -308,9 +326,12 @@ cp .env.example .env
 | `PORT` | Port the Express server listens on (default: 5000) | No — has default |
 | `NODE_ENV` | Environment: `development` \| `production` | No — has default |
 | `CLIENT_ORIGIN` | URL of the React frontend for CORS (default: `http://localhost:5173`) | No — has default |
-| `DATABASE_URL` | PostgreSQL connection string | No — pending setup |
-| `JWT_SECRET` | Secret key for signing JWT tokens | No — pending auth |
-| `JWT_EXPIRES_IN` | Token expiry duration (e.g. `7d`) | No — pending auth |
+| `DB_HOST` | PostgreSQL host (default: `localhost`) | No — has default |
+| `DB_PORT` | PostgreSQL port (default: `5432`) | No — has default |
+| `DB_NAME` | Database name (e.g. `sidra_db`) | **Yes** |
+| `DB_USER` | PostgreSQL username (e.g. `postgres`) | **Yes** |
+| `DB_PASSWORD` | PostgreSQL password — leave blank if none set | No — optional |
+| `SESSION_SECRET` | Secret for signing session cookies | No — pending auth |
 
 **Security rules:**
 - Never commit `.env` to version control — it is listed in `.gitignore`
@@ -403,17 +424,86 @@ The following features are planned and have not yet been implemented.
 
 | Feature | Notes |
 |---|---|
-| Real backend authentication (JWT) | Replace `AuthContext` simulation with real `POST /api/auth/register` and `POST /api/auth/login` |
-| PostgreSQL database | Users table needs `name`, `email`, `password_hash`, `family_role`, `created_at` |
+| Real backend authentication | Replace `AuthContext` simulation with server-managed sessions (`POST /api/auth/register`, `POST /api/auth/login`) |
 | Persistent profile data | Currently session-only; requires backend `GET /api/auth/me` and `PUT /api/auth/me` |
 | Course enrolment | Requires authentication |
-| Learning progress tracking | Requires database |
+| Learning progress tracking | Database tables exist; requires authenticated API endpoints |
 | Professional directory | Frontend placeholder exists at `/professionals` |
-| Professional profiles | Requires database + admin verification |
+| Professional profiles | Database table exists; requires admin verification flow |
 | Admin dashboard | Requires auth + role-based access control |
 | Payment integration (Telebirr, Chapa) | Requires backend + official provider APIs |
 | Real course data from API | Currently served from static `client/src/data/courses.js` |
 | Sidra social media accounts | Add real profile URLs to `SOCIAL_LINKS` in `Footer.jsx` when accounts are created |
+
+---
+
+## Database Schema
+
+The PostgreSQL schema lives in `server/src/db/schema.sql` and has been applied to `sidra_db`.
+
+### Tables
+
+| Table | Purpose |
+|---|---|
+| `users` | Every account — parents, professionals, and admins |
+| `professional_profiles` | Directory entry for professionals; visible only when `verification_status = 'approved'` |
+| `courses` | Course catalog; visible to the public only when `published = TRUE` |
+| `lessons` | Individual lessons within a course, ordered by `position` |
+| `enrollments` | User–course enrollment records; `UNIQUE (user_id, course_id)` prevents duplicates |
+| `lesson_progress` | Per-user lesson completion; `UNIQUE (user_id, lesson_id)` prevents duplicates |
+
+### Applying the schema
+
+```bash
+cd server
+npm run migrate
+```
+
+The migration script is **idempotent** — it uses `CREATE TABLE IF NOT EXISTS` throughout, so running it again on a database that already has the tables does nothing and loses no data.
+
+Expected output:
+
+```
+╔══════════════════════════════════════════╗
+║       Sidra — Database Migration         ║
+╚══════════════════════════════════════════╝
+  Database : sidra_db
+  Applying schema…
+  ✅  Schema applied successfully.
+
+  Tables found in sidra_db:
+    ✅ courses
+    ✅ enrollments
+    ✅ lesson_progress
+    ✅ lessons
+    ✅ professional_profiles
+    ✅ users
+
+  All 6 tables are present. Migration complete.
+```
+
+### Verifying tables in pgAdmin
+
+1. Open **pgAdmin 4** and connect to your server
+2. In the left panel expand: **sidra_db → Schemas → public → Tables**
+3. You should see all six tables listed
+
+Alternatively, open the **Query Tool** on `sidra_db` and run:
+
+```sql
+SELECT table_name
+FROM   information_schema.tables
+WHERE  table_schema = 'public'
+  AND  table_type   = 'BASE TABLE'
+ORDER  BY table_name;
+```
+
+### Security notes
+
+- `password_hash` stores a bcrypt hash only — plaintext passwords are never stored
+- The `role` column is enforced server-side; public registration must never be allowed to set `role = 'admin'`
+- Payment card details are never stored — the `enrollments.payment_status` column holds only a lifecycle status string
+- Raw credentials (PINs, card numbers, wallet secrets) must never be written to the database
 
 ---
 
@@ -458,8 +548,8 @@ Detailed documentation lives in the [`docs/`](./docs) folder.
 | 4 | Courses page — catalog, filtering, detail pages | ✅ Complete |
 | 5 | Backend foundation — Express server scaffold | ✅ Complete |
 | 6 | Auth UI — Login, Register, Profile pages, role-based avatars | ✅ Complete (frontend simulation) |
-| 7 | Database schema design and PostgreSQL setup | 🔲 Next |
-| 8 | Backend API — real authentication and user management | 🔲 Planned |
+| 7 | PostgreSQL connection + database schema (6 tables) | ✅ Complete |
+| 8 | Backend API — real authentication and session management | 🔲 Next |
 | 9 | Connect frontend to real API (replace static data and auth simulation) | 🔲 Planned |
 | 10 | Professional directory | 🔲 Planned |
 | 11 | Admin dashboard | 🔲 Planned |

@@ -48,9 +48,9 @@ function RoleCard({ role, selected, onChange }) {
       className={`relative flex flex-col items-center text-center gap-3 p-5 rounded-2xl border-2 cursor-pointer
                   transition-all duration-150 select-none
                   ${isSelected
-                    ? 'border-terracotta bg-terracotta/5 shadow-md'
-                    : 'border-border bg-white hover:border-terracotta/50 hover:bg-cream'
-                  }`}
+          ? 'border-terracotta bg-terracotta/5 shadow-md'
+          : 'border-border bg-white hover:border-terracotta/50 hover:bg-cream'
+        }`}
     >
       <input
         type="radio"
@@ -107,13 +107,13 @@ export default function RegisterPage() {
 
   function validate() {
     const e = {}
-    if (!form.name.trim())               e.name = 'Full name is required.'
-    if (!form.email.trim())              e.email = 'Email address is required.'
+    if (!form.name.trim()) e.name = 'Full name is required.'
+    if (!form.email.trim()) e.email = 'Email address is required.'
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Please enter a valid email address.'
-    if (!form.password)                  e.password = 'Password is required.'
-    else if (form.password.length < 8)   e.password = 'Password must be at least 8 characters.'
+    if (!form.password) e.password = 'Password is required.'
+    else if (form.password.length < 8) e.password = 'Password must be at least 8 characters.'
     if (form.confirmPassword !== form.password) e.confirmPassword = 'Passwords do not match.'
-    if (!familyRole)                     e.familyRole = 'Please select your role in the family.'
+    if (!familyRole) e.familyRole = 'Please select your role in the family.'
     return e
   }
 
@@ -128,6 +128,15 @@ export default function RegisterPage() {
       await register({ name: form.name, email: form.email, password: form.password, familyRole })
       navigate('/profile')
     } catch (err) {
+      // Surface field-level errors returned by the backend (e.g. duplicate email)
+      if (err.fields) {
+        // Map backend field names back to frontend names
+        const mapped = {}
+        if (err.fields.full_name) mapped.name = err.fields.full_name
+        if (err.fields.email) mapped.email = err.fields.email
+        if (err.fields.password) mapped.password = err.fields.password
+        setErrors(mapped)
+      }
       setSubmitError(err.message ?? 'Something went wrong. Please try again.')
     } finally {
       setSubmitting(false)
@@ -143,16 +152,6 @@ export default function RegisterPage() {
           <Link to="/" aria-label="Go to Sidra home">
             <img src={logo} alt="Sidra (ሰድራ) — Guidance for Every Family" className="h-16 w-auto" />
           </Link>
-        </div>
-
-        {/* Dev notice */}
-        <div className="mb-6 flex gap-3 bg-white border border-border rounded-xl p-4 text-sm text-warm-gray shadow-sm">
-          <span className="text-terracotta text-base flex-shrink-0" aria-hidden="true">ℹ️</span>
-          <div>
-            <span className="font-semibold text-charcoal">Development preview — </span>
-            account creation is frontend-only. Your details will not be stored on a server
-            until backend authentication is connected.
-          </div>
         </div>
 
         <div className="card p-8 sm:p-10">

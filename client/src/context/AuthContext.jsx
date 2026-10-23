@@ -1,35 +1,24 @@
 /**
  * AuthContext.jsx — Sidra frontend authentication state
  *
- * CURRENT STATE: Frontend-only session management.
- * No real backend authentication is connected yet.
+ * Connected to the real Express + PostgreSQL backend.
+ * Sessions are managed server-side; the browser holds only an HttpOnly
+ * cookie. No authentication data is stored in localStorage or sessionStorage.
  *
- * What this does:
- *   - Holds the current user object in React state.
- *   - Provides login(), register(), logout(), and updateProfile() helpers.
- *   - Persists the session to sessionStorage so a page refresh does not
- *     immediately log the user out during development.
- *     ⚠ sessionStorage is cleared when the browser tab is closed.
- *     ⚠ Passwords are NEVER stored — only the non-sensitive profile data.
+ * Backend field names differ slightly from the frontend display names:
+ *   backend: full_name, role
+ *   frontend display: name (derived), role (same)
  *
- * What this does NOT do:
- *   - It does not contact a real API.
- *   - It does not issue or verify JWT tokens.
- *   - It does not communicate with the database.
- *   - It does not provide real security.
- *
- * When the backend auth API is ready:
- *   1. Replace the body of login() with a real POST /api/auth/login call.
- *   2. Replace the body of register() with a real POST /api/auth/register call.
- *   3. Replace the body of updateProfile() with a real PUT /api/auth/me call.
- *   4. Store only the returned JWT token (in memory or httpOnly cookie — not
- *      localStorage) and fetch the user profile via GET /api/auth/me.
- *   5. Remove the sessionStorage simulation.
+ * The `user` object exposed to the rest of the app is normalised so
+ * components can use user.name, user.role, user.email consistently.
  */
 
 import { createContext, useContext, useState, useEffect } from 'react'
+import { authApi } from '../services/api.js'
 
 // ── Role constants ────────────────────────────────────────────────────────────
+// These are the family/account roles supported by the platform.
+// Used in registration forms, profile selectors, and role-based avatar display.
 
 export const FAMILY_ROLES = [
   {
@@ -80,9 +69,19 @@ export function getRoleLabel(value) {
   return FAMILY_ROLES.find((r) => r.value === value)?.label ?? value
 }
 
-// ── Context ───────────────────────────────────────────────────────────────────
+// ── Normalise the backend user object ─────────────────────────────────────────
+// Backend returns: { id, full_name, email, role, is_active, created_at }
+// Frontend expects: { id, name, email, role, is_active, created_at }
+// This single function keeps the mapping in one place.
+function normaliseUser(backendUser) {
+  if (!backendUser) return null
+  return {
+    ...backendUser,
+    name: backendUser.full_name,  // alias for display convenience
+  }
+}
 
-const SESSION_KEY = 'sidra_dev_session'
+// ── Context ───────────────────────────────────────────────────────────────────
 
 const AuthContext = createContext(null)
 
@@ -90,116 +89,83 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Restore dev session on mount
+  // On mount: call GET /api/auth/me to restore session from the HttpOnly cookie.
+  // If the cookie is absent or expired the server returns 401 — we just set
+  // user to null (not logged in). No sessionStorage or localStorage involved.
   useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem(SESSION_KEY)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        // Basic sanity check — never restore a stored password
-        if (parsed && parsed.email && !parsed.password) {
-          setUser(parsed)
-        }
-      }
-    } catch {
-      sessionStorage.removeItem(SESSION_KEY)
-    } finally {
-      setLoading(false)
-    }
+    authApi.me()
+      .then((data) => setUser(normaliseUser(data.user)))
+      .catch(() => setUser(null))          // 401 = not logged in, not an error
+      .finally(() => setLoading(false))
   }, [])
 
   /**
    * register()
    *
-   * Frontend-only simulation. Validates fields and stores a non-sensitive
-   * profile object in sessionStorage. NO password is stored.
+   * Maps frontend field names to backend field names and calls
+   * POST /api/auth/register. On success the server sets the session
+   * cookie and returns the user profile.
    *
-   * When the backend is ready, replace this with:
-   *   const res = await fetch('/api/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password, familyRole }) })
-   *   const data = await res.json()
-   *   // store JWT token securely, then fetch /api/auth/me
+   * @param {{ name, email, password, familyRole }} params
    */
-  async function register({ name, email, password: _password, familyRole }) {
-    if (!ALLOWED_ROLE_VALUES.includes(familyRole)) {
-      throw new Error('Invalid family role selected.')
-    }
-    // Simulate API latency
-    await new Promise((r) => setTimeout(r, 600))
-
-    const profile = {
-      id: `dev-${Date.now()}`,
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      familyRole,
-      createdAt: new Date().toISOString(),
-      _devOnly: true,
-    }
-
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(profile))
-    setUser(profile)
-    return profile
+  async function register({ name, email, password, familyRole }) {
+    const data = await authApi.register({
+      full_name: name,         // backend field name
+      email,
+      password,
+      role: familyRole,        // backend field name
+    })
+    const normalised = normaliseUser(data.user)
+    setUser(normalised)
+    return normalised
   }
 
   /**
    * login()
    *
-   * Frontend-only simulation. Accepts any non-empty email + password and
-   * creates a temporary dev session. NO credentials are stored.
+   * Calls POST /api/auth/login. On success the server sets the session
+   * cookie and returns the user profile.
    *
-   * ADMIN DEV SHORTCUT: if the email contains "admin", the session gets
-   * isAdmin: true so you can test the Admin Dashboard without a backend.
-   * This is a development convenience ONLY — it provides no real security.
-   *
-   * When the backend is ready, replace this with a real POST /api/auth/login.
+   * @param {{ email, password }} params
    */
-  async function login({ email, password: _password }) {
-    await new Promise((r) => setTimeout(r, 600))
-
-    const isAdmin = email.toLowerCase().includes('admin')
-
-    const profile = {
-      id: `dev-${Date.now()}`,
-      name: email.split('@')[0],
-      email: email.trim().toLowerCase(),
-      familyRole: null,
-      isAdmin,
-      createdAt: new Date().toISOString(),
-      _devOnly: true,
-    }
-
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(profile))
-    setUser(profile)
-    return profile
+  async function login({ email, password }) {
+    const data = await authApi.login({ email, password })
+    const normalised = normaliseUser(data.user)
+    setUser(normalised)
+    return normalised
   }
 
   /**
    * updateProfile()
    *
-   * Updates the in-memory and sessionStorage profile.
-   * When the backend is ready, replace with a PUT /api/auth/me call.
+   * Calls PUT /api/auth/me with the allowed update fields.
+   * Maps familyRole → role for the backend.
+   *
+   * @param {{ name?: string, familyRole?: string }} updates
    */
-  async function updateProfile(updates) {
-    if (!user) throw new Error('Not authenticated.')
-
-    const allowed = {}
-    if (updates.name !== undefined) allowed.name = updates.name.trim()
-    if (updates.familyRole !== undefined) {
-      if (!ALLOWED_ROLE_VALUES.includes(updates.familyRole)) {
-        throw new Error('Invalid family role.')
-      }
-      allowed.familyRole = updates.familyRole
-    }
-
-    await new Promise((r) => setTimeout(r, 400))
-
-    const updated = { ...user, ...allowed }
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(updated))
-    setUser(updated)
-    return updated
+  async function updateProfile({ name, familyRole } = {}) {
+    const body = {}
+    if (name !== undefined) body.full_name = name
+    if (familyRole !== undefined) body.role = familyRole
+    const data = await authApi.updateMe(body)
+    const normalised = normaliseUser(data.user)
+    setUser(normalised)
+    return normalised
   }
 
-  function logout() {
-    sessionStorage.removeItem(SESSION_KEY)
+  /**
+   * logout()
+   *
+   * Calls POST /api/auth/logout which deletes the session row in
+   * PostgreSQL and clears the cookie. Then clears the local user state.
+   * Always resolves — a network error on logout still clears local state.
+   */
+  async function logout() {
+    try {
+      await authApi.logout()
+    } catch {
+      // Best-effort — clear local state regardless
+    }
     setUser(null)
   }
 

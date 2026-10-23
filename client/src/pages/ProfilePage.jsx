@@ -68,14 +68,14 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [nameError, setNameError] = useState('')
 
-  function handleLogout() {
-    logout()
+  async function handleLogout() {
+    await logout()
     navigate('/')
   }
 
   function startEditing() {
     setEditName(user.name)
-    setEditRole(user.familyRole ?? '')
+    setEditRole(user.role ?? '')     // backend uses 'role', normalised as both role and familyRole
     setSaveError('')
     setSaveSuccess(false)
     setNameError('')
@@ -137,17 +137,7 @@ export default function ProfilePage() {
     <main id="main-content" tabIndex={-1} className="bg-cream min-h-screen py-10 px-4">
       <div className="max-w-xl mx-auto flex flex-col gap-6">
 
-        {/* Dev notice */}
-        {user._devOnly && (
-          <div className="flex gap-3 bg-white border border-border rounded-xl p-4 text-sm text-warm-gray shadow-sm">
-            <span className="text-terracotta text-base flex-shrink-0" aria-hidden="true">ℹ️</span>
-            <div>
-              <span className="font-semibold text-charcoal">Development session — </span>
-              this profile is stored in your browser session only and will not persist across tabs or after the tab is closed.
-              Real profile persistence requires the backend authentication API.
-            </div>
-          </div>
-        )}
+        {/* Dev notice removed — backend session is now live */}
 
         {/* Success banner */}
         {saveSuccess && (
@@ -181,7 +171,7 @@ export default function ProfilePage() {
             <div className="flex flex-col gap-6">
               {/* Avatar + name */}
               <div className="flex items-center gap-5">
-                <RoleAvatar role={user.familyRole ?? null} size={80} />
+                <RoleAvatar role={user.role ?? null} size={80} />
                 <div>
                   <p className="text-xl font-bold text-charcoal">{user.name}</p>
                   <p className="text-sm text-warm-gray mt-0.5">{user.email}</p>
@@ -193,7 +183,7 @@ export default function ProfilePage() {
                 <span className="text-xs font-semibold uppercase tracking-wider text-warm-gray w-24 flex-shrink-0">
                   Family role
                 </span>
-                <RoleBadge value={user.familyRole} />
+                <RoleBadge value={user.role} />
               </div>
 
               {/* Email note */}
@@ -216,7 +206,7 @@ export default function ProfilePage() {
 
               {/* Avatar — updates to reflect editRole as user changes selection */}
               <div className="flex justify-center">
-                <RoleAvatar role={editRole || user.familyRole || null} size={80} />
+                <RoleAvatar role={editRole || user.role || null} size={80} />
               </div>
 
               {/* Name */}

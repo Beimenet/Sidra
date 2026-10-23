@@ -42,8 +42,8 @@ export default function LoginPage() {
 
   function validate() {
     const e = {}
-    if (!form.email.trim())   e.email    = 'Email address is required.'
-    if (!form.password)       e.password = 'Password is required.'
+    if (!form.email.trim()) e.email = 'Email address is required.'
+    if (!form.password) e.password = 'Password is required.'
     return e
   }
 
@@ -75,16 +75,6 @@ export default function LoginPage() {
           <Link to="/" aria-label="Go to Sidra home">
             <img src={logo} alt="Sidra (ሰድራ) — Guidance for Every Family" className="h-16 w-auto" />
           </Link>
-        </div>
-
-        {/* Dev notice */}
-        <div className="mb-6 flex gap-3 bg-white border border-border rounded-xl p-4 text-sm text-warm-gray shadow-sm">
-          <span className="text-terracotta text-base flex-shrink-0" aria-hidden="true">ℹ️</span>
-          <div>
-            <span className="font-semibold text-charcoal">Development preview — </span>
-            login accepts any valid email and password for UI testing.
-            Real authentication will be enabled when the backend is connected.
-          </div>
         </div>
 
         <div className="card p-8">

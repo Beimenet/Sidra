@@ -53,13 +53,10 @@ function ProtectedRoute({ children }) {
  * AdminRoute — redirects to /login if not authenticated, or to / if
  * authenticated but not an admin.
  *
- * ⚠ IMPORTANT: This is a UI-layer guard only. It does NOT provide real
- * security. Every sensitive admin operation must be protected server-side
- * by verifying the JWT and checking the user's role in the database.
+ * ⚠ UI-layer guard only. Server-side middleware enforces real authorization
+ * on every protected API endpoint. Never rely on this alone for security.
  *
- * DEV SHORTCUT: log in with any email containing "admin" (e.g. admin@sidra.et)
- * to get isAdmin: true in the frontend session. This shortcut must be removed
- * when real backend authentication is implemented.
+ * Admin access is determined by user.role === 'admin' from the real backend.
  */
 function AdminRoute({ children }) {
   const { user, loading } = useAuth()
@@ -77,7 +74,7 @@ function AdminRoute({ children }) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />
   }
 
-  if (!user.isAdmin) {
+  if (user.role !== 'admin') {
     return <Navigate to="/" replace />
   }
 
