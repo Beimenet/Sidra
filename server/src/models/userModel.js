@@ -114,6 +114,35 @@ export async function deactivateUser(id) {
 }
 
 /**
+ * Update a user's password hash directly.
+ * Used only by the change-password endpoint after verifying the current password.
+ * NEVER call this without first verifying the user's current password.
+ * @param {string} id UUID
+ * @param {string} password_hash bcrypt hash of the new password
+ */
+export async function updatePasswordHash(id, password_hash) {
+  await pool.query(
+    `UPDATE users SET password_hash = $2 WHERE id = $1`,
+    [id, password_hash]
+  )
+}
+
+/**
+ * Find a user by id INCLUDING the password_hash.
+ * Use ONLY for change-password verification.
+ * NEVER return the result of this function directly to an API response.
+ * @param {string} id UUID
+ */
+export async function findUserByIdWithHash(id) {
+  const { rows } = await pool.query(
+    `SELECT id, full_name, email, password_hash, role, is_active, created_at
+     FROM users WHERE id = $1`,
+    [id]
+  )
+  return rows[0] ?? null
+}
+
+/**
  * List all users — admin use only.
  */
 export async function listUsers() {

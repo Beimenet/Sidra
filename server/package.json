@@ -8,7 +8,9 @@
     "dev": "node --watch src/app.js",
     "start": "node src/app.js",
     "migrate": "node src/db/migrate.js",
-    "test": "node tests/auth.test.js"
+    "test": "node tests/auth.test.js",
+    "test:profile": "node tests/profile.test.js",
+    "test:all": "node tests/auth.test.js && node tests/profile.test.js"
   },
   "engines": {
     "node": ">=18.0.0"

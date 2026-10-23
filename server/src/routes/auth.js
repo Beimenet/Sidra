@@ -18,6 +18,8 @@ import {
   findUserByEmail,
   findUserByEmailWithHash,
   updateUser,
+  findUserByIdWithHash,
+  updatePasswordHash,
 } from '../models/userModel.js'
 import { hashPassword, verifyPassword, DUMMY_HASH } from '../utils/password.js'
 import {
@@ -26,6 +28,7 @@ import {
   purgeExpiredSessions,
   COOKIE_NAME,
   cookieOptions,
+  deleteAllUserSessions,
 } from '../utils/session.js'
 import { authenticate } from '../middleware/authenticate.js'
 
@@ -208,6 +211,80 @@ router.put('/me', authenticate, async (req, res, next) => {
     })
 
     return res.status(200).json({ user: updated })
+
+  } catch (err) {
+    next(err)
+  }
+})
+
+// ── POST /api/auth/change-password ───────────────────────────────────────────
+//
+// Requires authentication.
+// Verifies the current password before applying the new one.
+// On success, invalidates ALL other sessions so any other logged-in
+// device/browser is forced to re-authenticate.
+// The current session is kept alive so the user is not logged out.
+
+router.post('/change-password', authenticate, async (req, res, next) => {
+  try {
+    const { current_password, new_password } = req.body
+
+    // ── Input validation ────────────────────────────────────────────────────
+    if (!current_password || !new_password) {
+      return res.status(400).json({
+        error: { message: 'current_password and new_password are both required.' },
+      })
+    }
+
+    if (!isValidPassword(new_password)) {
+      return res.status(400).json({
+        error: {
+          message: 'New password must be at least 8 characters and include a letter and a number.',
+          fields: { new_password: 'Must be at least 8 characters and include a letter and a number.' },
+        },
+      })
+    }
+
+    if (current_password === new_password) {
+      return res.status(400).json({
+        error: { message: 'New password must be different from your current password.' },
+      })
+    }
+
+    // ── Fetch the user's current hash ────────────────────────────────────────
+    const userWithHash = await findUserByIdWithHash(req.user.id)
+    if (!userWithHash) {
+      return res.status(404).json({
+        error: { message: 'User not found.' },
+      })
+    }
+
+    // ── Verify current password ──────────────────────────────────────────────
+    const match = await verifyPassword(current_password, userWithHash.password_hash)
+    if (!match) {
+      return res.status(401).json({
+        error: { message: 'Current password is incorrect.' },
+      })
+    }
+
+    // ── Hash and store the new password ──────────────────────────────────────
+    const newHash = await hashPassword(new_password)
+    await updatePasswordHash(req.user.id, newHash)
+
+    // ── Invalidate all OTHER sessions ────────────────────────────────────────
+    // Delete every session for this user, then re-create the current one so
+    // the caller stays logged in on this device.
+    await deleteAllUserSessions(req.user.id)
+
+    const newSessionId = await createSession(req.user.id, {
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+    })
+    res.cookie(COOKIE_NAME, newSessionId, cookieOptions())
+
+    return res.status(200).json({
+      message: 'Password changed successfully. Other sessions have been signed out.',
+    })
 
   } catch (err) {
     next(err)
