@@ -112,6 +112,8 @@ export default function RegisterPage() {
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Please enter a valid email address.'
     if (!form.password) e.password = 'Password is required.'
     else if (form.password.length < 8) e.password = 'Password must be at least 8 characters.'
+    else if (!/[A-Za-z]/.test(form.password) || !/[0-9]/.test(form.password))
+      e.password = 'Password must include at least one letter and one number.'
     if (form.confirmPassword !== form.password) e.confirmPassword = 'Passwords do not match.'
     if (!familyRole) e.familyRole = 'Please select your role in the family.'
     return e

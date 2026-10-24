@@ -56,7 +56,7 @@ app.get('/', (_req, res) => {
       courses: 'GET /api/courses',
       professionals: 'GET /api/professionals',
     },
-    note: 'Authentication and data endpoints are under development.',
+    note: 'Course, enrollment, and professional directory endpoints are under development.',
   })
 })
 

@@ -188,7 +188,7 @@ export default function ProfilePage() {
 
               {/* Email note */}
               <p className="text-xs text-warm-gray/80 bg-white border border-border rounded-lg px-3 py-2">
-                Email address cannot be changed here. A secure email-update flow will be added when the backend is connected.
+                Email address cannot be changed here. A secure email-update flow will be available in a future update.
               </p>
 
               <button

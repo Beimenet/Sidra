@@ -134,7 +134,7 @@ export default function LoginPage() {
             <p className="text-xs text-center text-warm-gray">
               Forgot your password?{' '}
               <span className="text-warm-gray/60">
-                Password reset will be available when authentication is implemented.
+                Password reset is not yet available.
               </span>
             </p>
           </form>

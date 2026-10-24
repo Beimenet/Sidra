@@ -101,12 +101,13 @@ export default function AdminUsersPage() {
   const [toast, setToast] = useState(null)  // { message, type }
 
   // ── Fetch users ────────────────────────────────────────────────────────
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (overridePage) => {
     setLoading(true)
     setError('')
     try {
+      const activePage = overridePage ?? page
       const isActiveParam = activeFilter === 'active' ? true : activeFilter === 'inactive' ? false : undefined
-      const res = await adminApi.listUsers({ search, role: roleFilter, is_active: isActiveParam, sort, page, limit: LIMIT })
+      const res = await adminApi.listUsers({ search, role: roleFilter, is_active: isActiveParam, sort, page: activePage, limit: LIMIT })
       setUsers(res.users ?? [])
       setTotal(res.total ?? 0)
       setPages(res.pages ?? 1)
@@ -119,8 +120,17 @@ export default function AdminUsersPage() {
 
   useEffect(() => { fetchUsers() }, [fetchUsers])
 
-  // Reset page when filters change
-  useEffect(() => { setPage(1) }, [search, roleFilter, activeFilter, sort])
+  // Reset page to 1 when filters change — pass 1 directly to avoid stale page fetch
+  useEffect(() => {
+    if (page !== 1) {
+      setPage(1)
+      // fetchUsers will be called again when page state updates via the effect above
+    } else {
+      // If already on page 1, trigger a fresh fetch directly
+      fetchUsers(1)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, roleFilter, activeFilter, sort])
 
   // ── Status change ──────────────────────────────────────────────────────
   async function confirmStatusChange() {

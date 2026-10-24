@@ -66,7 +66,12 @@ export const FAMILY_ROLES = [
 export const ALLOWED_ROLE_VALUES = FAMILY_ROLES.map((r) => r.value)
 
 export function getRoleLabel(value) {
-  return FAMILY_ROLES.find((r) => r.value === value)?.label ?? value
+  // Covers DB roles that are not in the registration picker
+  const extra = {
+    professional: 'Professional',
+    admin: 'Administrator',
+  }
+  return FAMILY_ROLES.find((r) => r.value === value)?.label ?? extra[value] ?? value
 }
 
 // ── Normalise the backend user object ─────────────────────────────────────────
