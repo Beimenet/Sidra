@@ -8,7 +8,9 @@ const NAV_LINKS = [
   { to: '/', label: 'Home' },
   { to: '/courses', label: 'Courses' },
   { to: '/professionals', label: 'Professionals' },
-  { to: '/about', label: 'About' },
+  { to: '/resources', label: 'Resources' },
+  { to: '/guides', label: 'Guides & Chat' },
+  { to: '/about', label: 'About Us' },
 ]
 
 export default function Navbar() {
@@ -54,13 +56,13 @@ export default function Navbar() {
 
   const linkClass = ({ isActive }) =>
     isActive
-      ? 'text-terracotta font-semibold border-b-2 border-terracotta pb-0.5'
-      : 'text-charcoal font-medium hover:text-terracotta transition-colors duration-150'
+      ? 'text-terracotta font-semibold relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-0.5 after:bg-terracotta after:rounded-full'
+      : 'text-warm-gray font-medium hover:text-charcoal transition-colors duration-150 relative'
 
   const mobileLinkClass = ({ isActive }) =>
     isActive
-      ? 'block px-4 py-3 text-terracotta font-semibold bg-cream rounded-lg'
-      : 'block px-4 py-3 text-charcoal font-medium hover:text-terracotta hover:bg-cream rounded-lg transition-colors duration-150'
+      ? 'block px-4 py-2.5 text-terracotta font-semibold bg-terracotta/8 rounded-lg'
+      : 'block px-4 py-2.5 text-warm-gray font-medium hover:text-charcoal hover:bg-cream rounded-lg transition-colors duration-150'
 
   // Profile avatar destination: /profile when logged in, /login when not
   const profileDest = user ? '/profile' : '/login'
@@ -93,21 +95,17 @@ export default function Navbar() {
             className="h-14 w-auto object-contain"
           />
           <span className="flex flex-col leading-tight select-none">
-            <span className="text-lg font-bold text-charcoal tracking-tight">
-              Sidra
+            <span className="text-base font-bold text-charcoal tracking-tight">
+              Sidra<span lang="am" className="text-terracotta">(ሥ.)</span>
             </span>
-            <span
-              lang="am"
-              className="text-sm font-semibold text-terracotta tracking-wide"
-              aria-label="ስድራ in Amharic"
-            >
-              ስድራ
+            <span className="text-[11px] text-warm-gray font-medium tracking-wide">
+              Solutions for Every Family
             </span>
           </span>
         </Link>
 
         {/* ── Desktop nav links ──────────────────────────────────────────── */}
-        <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
+        <div className="hidden md:flex items-center gap-5 flex-1 justify-center">
           {NAV_LINKS.map(({ to, label }) => (
             <NavLink key={to} to={to} end={to === '/'} className={linkClass}>
               {label}
@@ -129,19 +127,19 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            /* Guest: Login + Register buttons */
+            /* Guest: Login + Get Started buttons */
             <>
               <Link
                 to="/login"
-                className="text-sm font-semibold text-charcoal hover:text-terracotta transition-colors duration-150 px-3 py-2 rounded-lg hover:bg-cream"
+                className="text-sm font-medium text-charcoal hover:text-terracotta transition-colors duration-150 px-3 py-2 rounded-lg"
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="btn-primary py-2 px-5 text-sm"
+                className="text-sm font-semibold bg-terracotta text-white px-5 py-2 rounded-full hover:bg-terracotta-hover transition-colors duration-200 shadow-sm"
               >
-                Register
+                Get Started
               </Link>
             </>
           )}
