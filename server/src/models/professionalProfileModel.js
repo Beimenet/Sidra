@@ -82,3 +82,73 @@ export async function setVerificationStatus(id, status) {
   )
   return rows[0] ?? null
 }
+
+// ── Admin-only model functions ────────────────────────────────────────────────
+
+/**
+ * List pending professional applications — admin only.
+ */
+export async function listPendingProfiles() {
+  const { rows } = await pool.query(
+    `SELECT pp.*, u.full_name, u.email
+     FROM   professional_profiles pp
+     JOIN   users u ON u.id = pp.user_id
+     WHERE  pp.verification_status = 'pending'
+     ORDER  BY pp.created_at ASC`   // oldest first — review in submission order
+  )
+  return rows
+}
+
+/**
+ * Find a single professional profile by its own UUID (not user_id).
+ * Returns null if not found.
+ * @param {string} id Profile UUID
+ */
+export async function findProfileById(id) {
+  const { rows } = await pool.query(
+    `SELECT pp.*, u.full_name, u.email
+     FROM   professional_profiles pp
+     JOIN   users u ON u.id = pp.user_id
+     WHERE  pp.id = $1`,
+    [id]
+  )
+  return rows[0] ?? null
+}
+
+/**
+ * Approve a professional application.
+ * Sets verification_status = 'approved' and clears any prior rejection reason.
+ * @param {string} id Profile UUID
+ * @param {string} reviewedBy Admin user UUID
+ */
+export async function approveProfile(id, reviewedBy) {
+  const { rows } = await pool.query(
+    `UPDATE professional_profiles
+     SET verification_status = 'approved',
+         rejection_reason    = NULL,
+         updated_at          = NOW()
+     WHERE id = $1
+     RETURNING *`,
+    [id]
+  )
+  return rows[0] ?? null
+}
+
+/**
+ * Reject a professional application with an optional reason.
+ * @param {string} id Profile UUID
+ * @param {string} reviewedBy Admin user UUID
+ * @param {string|null} reason Human-readable rejection reason
+ */
+export async function rejectProfile(id, reviewedBy, reason = null) {
+  const { rows } = await pool.query(
+    `UPDATE professional_profiles
+     SET verification_status = 'rejected',
+         rejection_reason    = $2,
+         updated_at          = NOW()
+     WHERE id = $1
+     RETURNING *`,
+    [id, reason ?? null]
+  )
+  return rows[0] ?? null
+}

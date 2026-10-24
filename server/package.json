@@ -10,7 +10,8 @@
     "migrate": "node src/db/migrate.js",
     "test": "node tests/auth.test.js",
     "test:profile": "node tests/profile.test.js",
-    "test:all": "node tests/auth.test.js && node tests/profile.test.js"
+    "test:admin": "node tests/admin.test.js",
+    "test:all": "node tests/auth.test.js && node tests/profile.test.js && node tests/admin.test.js"
   },
   "engines": {
     "node": ">=18.0.0"

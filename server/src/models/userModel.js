@@ -113,6 +113,8 @@ export async function deactivateUser(id) {
   return rows[0] ?? null
 }
 
+
+
 /**
  * Update a user's password hash directly.
  * Used only by the change-password endpoint after verifying the current password.
@@ -149,5 +151,248 @@ export async function listUsers() {
   const { rows } = await pool.query(
     `SELECT ${SAFE_COLS} FROM users ORDER BY created_at DESC`
   )
+  return rows
+}
+
+// ── Admin-only model functions ────────────────────────────────────────────────
+
+/**
+ * Paginated, filterable user list for the admin dashboard.
+ *
+ * @param {{ search?, role?, is_active?, sort?, page?, limit? }} opts
+ * @returns {{ users: object[], total: number, page: number, limit: number, pages: number }}
+ */
+export async function adminListUsers({
+  search = '',
+  role = '',
+  is_active,          // true | false | undefined
+  sort = 'newest', // 'newest' | 'oldest'
+  page = 1,
+  limit = 20,
+} = {}) {
+  // Clamp pagination to safe values
+  const safePage = Math.max(1, parseInt(page, 10) || 1)
+  const safeLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20))
+  const offset = (safePage - 1) * safeLimit
+
+  const conditions = []
+  const params = []
+
+  if (search.trim()) {
+    params.push(`%${search.trim().toLowerCase()}%`)
+    conditions.push(`(LOWER(full_name) LIKE $${params.length} OR LOWER(email) LIKE $${params.length})`)
+  }
+  if (role) {
+    params.push(role)
+    conditions.push(`role = $${params.length}`)
+  }
+  if (is_active !== undefined) {
+    params.push(is_active)
+    conditions.push(`is_active = $${params.length}`)
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
+  const orderBy = sort === 'oldest' ? 'ORDER BY created_at ASC' : 'ORDER BY created_at DESC'
+
+  // Count query (no pagination)
+  const countRes = await pool.query(
+    `SELECT COUNT(*) AS total FROM users ${where}`,
+    params
+  )
+  const total = Number(countRes.rows[0].total)
+
+  // Data query
+  params.push(safeLimit, offset)
+  const dataRes = await pool.query(
+    `SELECT ${SAFE_COLS} FROM users ${where} ${orderBy}
+     LIMIT $${params.length - 1} OFFSET $${params.length}`,
+    params
+  )
+
+  return {
+    users: dataRes.rows,
+    total,
+    page: safePage,
+    limit: safeLimit,
+    pages: Math.ceil(total / safeLimit),
+  }
+}
+
+/**
+ * Set a user's is_active flag — admin only.
+ * Returns the updated user row or null if not found.
+ * @param {string} id
+ * @param {boolean} isActive
+ */
+export async function setUserStatus(id, isActive) {
+  const { rows } = await pool.query(
+    `UPDATE users SET is_active = $2 WHERE id = $1 RETURNING ${SAFE_COLS}`,
+    [id, isActive]
+  )
+  return rows[0] ?? null
+}
+
+/**
+ * Set a user's role — admin only.
+ * Accepts any valid schema role including 'admin'.
+ * Caller is responsible for access control and last-admin checks.
+ * @param {string} id
+ * @param {string} role
+ */
+export async function adminSetRole(id, role) {
+  const { rows } = await pool.query(
+    `UPDATE users SET role = $2 WHERE id = $1 RETURNING ${SAFE_COLS}`,
+    [id, role]
+  )
+  return rows[0] ?? null
+}
+
+/**
+ * Count active admin accounts.
+ * Used to prevent removing the last admin.
+ * @returns {Promise<number>}
+ */
+export async function countActiveAdmins() {
+  const { rows } = await pool.query(
+    `SELECT COUNT(*) AS cnt FROM users WHERE role = 'admin' AND is_active = TRUE`
+  )
+  return Number(rows[0].cnt)
+}
+
+/**
+ * Dashboard statistics — single efficient query over all tables.
+ * Returns real counts from the database; no fabricated values.
+ */
+export async function getDashboardStats() {
+  const { rows } = await pool.query(`
+    SELECT
+      -- User counts
+      COUNT(*)                                             AS total_users,
+      COUNT(*) FILTER (WHERE is_active = TRUE)            AS active_users,
+      COUNT(*) FILTER (WHERE is_active = FALSE)           AS inactive_users,
+      COUNT(*) FILTER (WHERE role = 'mother')             AS total_mothers,
+      COUNT(*) FILTER (WHERE role = 'father')             AS total_fathers,
+      COUNT(*) FILTER (WHERE role = 'legal_guardian')     AS total_legal_guardians,
+      COUNT(*) FILTER (WHERE role = 'professional')       AS total_professionals,
+      COUNT(*) FILTER (WHERE role = 'admin')              AS total_admins
+    FROM users
+  `)
+  const userStats = rows[0]
+
+  // Professional approval counts
+  const profRes = await pool.query(`
+    SELECT
+      COUNT(*) FILTER (WHERE verification_status = 'pending')  AS pending_applications,
+      COUNT(*) FILTER (WHERE verification_status = 'approved') AS approved_professionals,
+      COUNT(*) FILTER (WHERE verification_status = 'rejected') AS rejected_applications
+    FROM professional_profiles
+  `)
+  const profStats = profRes.rows[0]
+
+  // Course counts
+  const courseRes = await pool.query(`
+    SELECT
+      COUNT(*)                                         AS total_courses,
+      COUNT(*) FILTER (WHERE published = TRUE)        AS published_courses,
+      COUNT(*) FILTER (WHERE published = FALSE)       AS draft_courses
+    FROM courses
+  `)
+  const courseStats = courseRes.rows[0]
+
+  // Enrollment count
+  const enrollRes = await pool.query(`SELECT COUNT(*) AS total_enrollments FROM enrollments`)
+  const enrollStats = enrollRes.rows[0]
+
+  // Convert BigInt-like strings to numbers
+  const n = (v) => Number(v)
+
+  return {
+    users: {
+      total: n(userStats.total_users),
+      active: n(userStats.active_users),
+      inactive: n(userStats.inactive_users),
+      by_role: {
+        mother: n(userStats.total_mothers),
+        father: n(userStats.total_fathers),
+        legal_guardian: n(userStats.total_legal_guardians),
+        professional: n(userStats.total_professionals),
+        admin: n(userStats.total_admins),
+      },
+    },
+    professionals: {
+      pending_applications: n(profStats.pending_applications),
+      approved: n(profStats.approved_professionals),
+      rejected: n(profStats.rejected_applications),
+    },
+    courses: {
+      total: n(courseStats.total_courses),
+      published: n(courseStats.published_courses),
+      drafts: n(courseStats.draft_courses),
+    },
+    enrollments: {
+      total: n(enrollStats.total_enrollments),
+    },
+  }
+}
+
+/**
+ * Recently registered users — admin dashboard widget.
+ * @param {number} limit  max rows (1–50)
+ */
+export async function getRecentUsers(limit = 10) {
+  const safeLimit = Math.min(50, Math.max(1, parseInt(limit, 10) || 10))
+  const { rows } = await pool.query(
+    `SELECT ${SAFE_COLS} FROM users ORDER BY created_at DESC LIMIT $1`,
+    [safeLimit]
+  )
+  return rows
+}
+
+/**
+ * Recent platform activity — built from real database timestamps.
+ * Combines latest registrations, enrollments, and professional applications
+ * into a single chronological feed. No fabricated data.
+ * @param {number} limit  max items (1–50)
+ */
+export async function getRecentActivity(limit = 20) {
+  const safeLimit = Math.min(50, Math.max(1, parseInt(limit, 10) || 20))
+
+  const { rows } = await pool.query(`
+    SELECT *
+    FROM (
+      SELECT
+        'registration'             AS event_type,
+        u.id                       AS entity_id,
+        u.full_name                AS label,
+        u.role,
+        u.created_at               AS occurred_at
+      FROM users u
+
+      UNION ALL
+
+      SELECT
+        'enrollment'               AS event_type,
+        e.id                       AS entity_id,
+        c.title                    AS label,
+        NULL                       AS role,
+        e.enrolled_at              AS occurred_at
+      FROM enrollments e
+      JOIN courses c ON c.id = e.course_id
+
+      UNION ALL
+
+      SELECT
+        'professional_application' AS event_type,
+        pp.id                      AS entity_id,
+        u.full_name                AS label,
+        pp.verification_status     AS role,
+        pp.created_at              AS occurred_at
+      FROM professional_profiles pp
+      JOIN users u ON u.id = pp.user_id
+    ) activity
+    ORDER BY occurred_at DESC
+    LIMIT $1
+  `, [safeLimit])
+
   return rows
 }

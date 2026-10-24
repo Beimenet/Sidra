@@ -22,6 +22,7 @@ import healthRouter from './routes/health.js'
 import authRouter from './routes/auth.js'
 import coursesRouter from './routes/courses.js'
 import professionalsRouter from './routes/professionals.js'
+import adminRouter from './routes/admin.js'
 
 // Middleware
 import { notFound } from './middleware/notFound.js'
@@ -63,6 +64,7 @@ app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/courses', coursesRouter)
 app.use('/api/professionals', professionalsRouter)
+app.use('/api/admin', adminRouter)
 
 // ── 404 + error handling ──────────────────────────────────────────────────────
 // Must be registered after all routes
