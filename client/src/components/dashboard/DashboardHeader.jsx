@@ -44,7 +44,7 @@ export default function DashboardHeader({ title, breadcrumb }) {
               <span className="text-xs text-warm-gray">Administrator</span>
             </div>
             <Link to="/profile" aria-label="My Profile">
-              <RoleAvatar role={user.familyRole ?? null} size={36} />
+              <RoleAvatar role={user.role ?? null} size={36} />
             </Link>
           </>
         ) : (

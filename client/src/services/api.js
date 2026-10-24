@@ -49,33 +49,41 @@ async function request(path, options = {}) {
 // ── Auth endpoints ────────────────────────────────────────────────────────────
 
 export const authApi = {
-  /**
-   * Register a new user account.
-   * @param {{ full_name, email, password, role }} body
-   */
   register: (body) => request('/api/auth/register', { method: 'POST', body: JSON.stringify(body) }),
-
-  /**
-   * Log in with email and password.
-   * @param {{ email, password }} body
-   */
   login: (body) => request('/api/auth/login', { method: 'POST', body: JSON.stringify(body) }),
-
-  /**
-   * Log out — deletes the session on the server and clears the cookie.
-   */
   logout: () => request('/api/auth/logout', { method: 'POST' }),
-
-  /**
-   * Get the authenticated user's profile (also used to restore session on mount).
-   * Returns null-ish data on 401 rather than throwing, so callers can treat it
-   * as "not logged in" gracefully.
-   */
   me: () => request('/api/auth/me'),
-
-  /**
-   * Update the authenticated user's name and/or role.
-   * @param {{ full_name?: string, role?: string }} body
-   */
   updateMe: (body) => request('/api/auth/me', { method: 'PUT', body: JSON.stringify(body) }),
+}
+
+// ── Admin endpoints ───────────────────────────────────────────────────────────
+
+export const adminApi = {
+  // ── Dashboard ─────────────────────────────────────────────────────────────
+  getStats: () => request('/api/admin/dashboard/stats'),
+  getRecentUsers: (limit) => request(`/api/admin/dashboard/recent-users?limit=${limit ?? 10}`),
+  getRecentActivity: (limit) => request(`/api/admin/dashboard/recent-activity?limit=${limit ?? 20}`),
+
+  // ── User management ────────────────────────────────────────────────────────
+  listUsers: ({ search = '', role = '', is_active, sort = 'newest', page = 1, limit = 20 } = {}) => {
+    const params = new URLSearchParams({ sort, page, limit })
+    if (search) params.set('search', search)
+    if (role) params.set('role', role)
+    if (is_active !== undefined) params.set('is_active', String(is_active))
+    return request(`/api/admin/users?${params}`)
+  },
+  getUser: (id) => request(`/api/admin/users/${id}`),
+  setStatus: (id, is_active) => request(`/api/admin/users/${id}/status`, {
+    method: 'PATCH', body: JSON.stringify({ is_active }),
+  }),
+  setRole: (id, role) => request(`/api/admin/users/${id}/role`, {
+    method: 'PATCH', body: JSON.stringify({ role }),
+  }),
+
+  // ── Professional approvals ─────────────────────────────────────────────────
+  getPendingProfessionals: () => request('/api/admin/professionals/pending'),
+  approveProfile: (id) => request(`/api/admin/professionals/${id}/approve`, { method: 'PATCH' }),
+  rejectProfile: (id, reason) => request(`/api/admin/professionals/${id}/reject`, {
+    method: 'PATCH', body: JSON.stringify({ reason }),
+  }),
 }
