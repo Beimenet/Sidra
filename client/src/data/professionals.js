@@ -138,7 +138,7 @@ export const PROFESSIONALS = [
     title: 'Pediatric Speech-Language Pathologist',
     credentials: 'MS, CCC-SLP Certified',
     specialty: 'Speech & Occupational Therapist',
-    institution: 'Children\'s Therapy Center, Addis Ababa',
+    institution: "Children's Therapy Center, Addis Ababa",
     tags: ['Speech Delay', 'Bilingual Acquisition', 'Ages 2-8'],
     languages: ['Amharic', 'English'],
     format: 'Both',

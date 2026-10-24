@@ -8,14 +8,19 @@ import CourseDetailPage from '../pages/CourseDetailPage.jsx'
 import PlaceholderPage from '../pages/PlaceholderPage.jsx'
 import NotFoundPage from '../pages/NotFoundPage.jsx'
 
+// ── Professional pages ────────────────────────────────────────────────────────
+import ProfessionalsPage from '../pages/ProfessionalsPage.jsx'
+import ProfessionalProfilePage from '../pages/ProfessionalProfilePage.jsx'
+
+// ── Content pages ─────────────────────────────────────────────────────────────
+import AboutPage from '../pages/AboutPage.jsx'
+import ResourcesPage from '../pages/ResourcesPage.jsx'
+import CirclesAndChatPage from '../pages/CirclesAndChatPage.jsx'
+
 // ── Auth pages ────────────────────────────────────────────────────────────────
 import LoginPage from '../pages/LoginPage.jsx'
 import RegisterPage from '../pages/RegisterPage.jsx'
 import ProfilePage from '../pages/ProfilePage.jsx'
-
-// ── Professional pages ─────────────────────────────────────────────────────────
-import ProfessionalsPage from '../pages/ProfessionalsPage.jsx'
-import ProfessionalProfilePage from '../pages/ProfessionalProfilePage.jsx'
 
 // ── Admin pages ───────────────────────────────────────────────────────────────
 import AdminOverviewPage from '../pages/admin/AdminOverviewPage.jsx'
@@ -31,7 +36,6 @@ import AdminSettingsPage from '../pages/admin/AdminSettingsPage.jsx'
 
 /**
  * ProtectedRoute — redirects unauthenticated users to /login.
- *
  * UI convenience only — real authorization is enforced server-side.
  */
 function ProtectedRoute({ children }) {
@@ -96,11 +100,16 @@ export default function AppRoutes() {
       <Route path="/courses" element={<CoursesPage />} />
       <Route path="/courses/:id" element={<CourseDetailPage />} />
 
+      {/* Professionals */}
       <Route path="/professionals" element={<ProfessionalsPage />} />
       <Route path="/professionals/:id" element={<ProfessionalProfilePage />} />
-      <Route path="/about" element={<PlaceholderPage title="About Sidra" description="Learn more about our mission to support every family on their parenting journey." />} />
-      <Route path="/resources" element={<PlaceholderPage title="Resources" description="A curated library of resources for families is coming soon." />} />
-      <Route path="/guides" element={<PlaceholderPage title="Guides & Chat" description="Expert guides and chat features are coming soon." />} />
+
+      {/* Content pages */}
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/resources" element={<ResourcesPage />} />
+      <Route path="/circles" element={<CirclesAndChatPage />} />
+
+      {/* Legal */}
       <Route path="/privacy" element={<PlaceholderPage title="Privacy Policy" description="The Privacy Policy will be published before the platform launches." />} />
       <Route path="/terms" element={<PlaceholderPage title="Terms of Use" description="The Terms of Use will be published before the platform launches." />} />
 

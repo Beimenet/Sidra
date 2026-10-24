@@ -8,7 +8,9 @@ const NAV_LINKS = [
   { to: '/', label: 'Home' },
   { to: '/courses', label: 'Courses' },
   { to: '/professionals', label: 'Professionals' },
-  { to: '/about', label: 'About' },
+  { to: '/resources', label: 'Resources' },
+  { to: '/circles', label: 'Circles & Chat' },
+  { to: '/about', label: 'About Us' },
 ]
 
 export default function Navbar() {
