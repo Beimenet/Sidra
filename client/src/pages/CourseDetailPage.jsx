@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { getCourseById, formatPrice } from '../data/courses.js'
 import PaymentModal from '../components/courses/PaymentModal.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 
 // ── Icon helpers ──────────────────────────────────────────────────────────────
 function CheckIcon() {
@@ -21,16 +22,16 @@ function ChevronIcon({ open }) {
 }
 
 function lessonTypeIcon(type) {
-  if (type === 'video')        return '▶'
-  if (type === 'reading')      return '📄'
+  if (type === 'video') return '▶'
+  if (type === 'reading') return '📄'
   if (type === 'downloadable') return '⬇'
   return '📌'
 }
 
 function lessonTypeBadge(type) {
   const map = {
-    video:        'bg-terracotta/10 text-terracotta',
-    reading:      'bg-sage/20 text-charcoal',
+    video: 'bg-terracotta/10 text-terracotta',
+    reading: 'bg-sage/20 text-charcoal',
     downloadable: 'bg-charcoal/8 text-charcoal',
   }
   return map[type] ?? 'bg-cream text-charcoal'
@@ -135,9 +136,72 @@ function ResourceItem({ resource }) {
   )
 }
 
+// ── Enrol button — handles auth state and API availability ───────────────────
+/**
+ * Behaviour:
+ *  - Not logged in  → redirect to /login, preserving the course URL as `from`
+ *  - Logged in      → show "Enrolment coming soon" notice (enrollment API not
+ *                     yet implemented by Amanuel — no fake success created)
+ *
+ * When Amanuel's POST /api/enrollments endpoint is ready:
+ *   1. Add  enrollmentApi.enroll(courseId)  to api.js
+ *   2. Replace the "coming soon" block below with a real API call
+ */
+function EnrolButton({ user, course, navigate, location }) {
+  function handleClick() {
+    if (!user) {
+      // Not logged in — send to login and remember where to return
+      navigate('/login', { state: { from: location.pathname } })
+      return
+    }
+    // Logged in but enrollment API not yet available
+    // Component stays mounted; the notice below is shown instead of an alert
+  }
+
+  // Not logged in
+  if (!user) {
+    return (
+      <>
+        <button
+          type="button"
+          className="btn-primary w-full mb-3"
+          onClick={handleClick}
+        >
+          Log in to Enrol
+        </button>
+        <p className="text-xs text-center text-warm-gray">
+          You need an account to enrol. Login is free.
+        </p>
+      </>
+    )
+  }
+
+  // Logged in — enrollment API not yet implemented
+  return (
+    <>
+      <button
+        type="button"
+        className="btn-primary w-full mb-3 opacity-60 cursor-not-allowed"
+        disabled
+        aria-disabled="true"
+        title="Course enrollment is not yet available"
+      >
+        Enrol for Free
+      </button>
+      <p className="text-xs text-center text-warm-gray leading-relaxed">
+        Course enrollment is not yet available.
+        We are working on connecting this feature — check back soon.
+      </p>
+    </>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function CourseDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { user } = useAuth()
   const course = getCourseById(id)
   const [paymentOpen, setPaymentOpen] = useState(false)
 
@@ -252,15 +316,9 @@ export default function CourseDetailPage() {
                   Sidra is committed to making parenting education affordable for every Ethiopian family.
                 </p>
 
-                {/* Enrol button */}
+                {/* ── Enrol / Purchase button ────────────────────────────── */}
                 {isFree ? (
-                  <button
-                    type="button"
-                    className="btn-primary w-full mb-3"
-                    onClick={() => alert('Account functionality is coming soon. You will be able to enrol once authentication is implemented.')}
-                  >
-                    Enrol for Free
-                  </button>
+                  <EnrolButton user={user} course={course} navigate={navigate} location={location} />
                 ) : (
                   <button
                     type="button"
@@ -270,12 +328,6 @@ export default function CourseDetailPage() {
                     Purchase Course
                   </button>
                 )}
-
-                <p className="text-xs text-center text-warm-gray">
-                  {isFree
-                    ? 'Account sign-up required — authentication coming soon.'
-                    : 'Online payments are coming soon. No charge will be made.'}
-                </p>
 
                 <hr className="my-5 border-border" />
 
