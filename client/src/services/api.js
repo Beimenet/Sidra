@@ -56,6 +56,48 @@ export const authApi = {
   updateMe: (body) => request('/api/auth/me', { method: 'PUT', body: JSON.stringify(body) }),
 }
 
+// ── Course endpoints ──────────────────────────────────────────────────────────
+
+export const coursesApi = {
+  /** GET /api/courses — public published course list */
+  list: () => request('/api/courses'),
+
+  /** GET /api/courses/:id — course detail with lessons (public if published) */
+  get: (id) => request(`/api/courses/${id}`),
+
+  /** POST /api/courses/:id/enroll — authenticated enrollment */
+  enroll: (courseId) => request(`/api/courses/${courseId}/enroll`, { method: 'POST' }),
+
+  /** GET /api/courses/:id/progress — authenticated, enrolled users only */
+  getProgress: (courseId) => request(`/api/courses/${courseId}/progress`),
+
+  /**
+   * POST /api/courses/:courseId/lessons/:lessonId/complete
+   * Mark a lesson complete or incomplete.
+   * @param {string} courseId
+   * @param {string} lessonId
+   * @param {boolean} completed — default true
+   */
+  markLesson: (courseId, lessonId, completed = true) =>
+    request(`/api/courses/${courseId}/lessons/${lessonId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify({ completed }),
+    }),
+}
+
+// ── Enrollment endpoints ──────────────────────────────────────────────────────
+
+export const enrollmentApi = {
+  /** GET /api/enrollments/me — authenticated user's enrollment list */
+  mine: () => request('/api/enrollments/me'),
+
+  /** GET /api/enrollments/:id — owner or admin */
+  get: (id) => request(`/api/enrollments/${id}`),
+
+  /** GET /api/enrollments/:id/progress — owner or admin */
+  getProgress: (id) => request(`/api/enrollments/${id}/progress`),
+}
+
 // ── Admin endpoints ───────────────────────────────────────────────────────────
 
 export const adminApi = {
@@ -86,4 +128,13 @@ export const adminApi = {
   rejectProfile: (id, reason) => request(`/api/admin/professionals/${id}/reject`, {
     method: 'PATCH', body: JSON.stringify({ reason }),
   }),
+
+  // ── Enrollment management ──────────────────────────────────────────────────
+  listEnrollments: ({ course_id, user_id, status, page = 1, limit = 20 } = {}) => {
+    const params = new URLSearchParams({ page, limit })
+    if (course_id) params.set('course_id', course_id)
+    if (user_id) params.set('user_id', user_id)
+    if (status) params.set('status', status)
+    return request(`/api/admin/enrollments?${params}`)
+  },
 }

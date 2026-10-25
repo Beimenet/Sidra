@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sidra (ስድራ) — Project Documentation</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#303033;background:#fff;line-height:1.7;font-size:11pt}
+.cover{background:linear-gradient(135deg,#D9755E,#8B3A25);color:#fff;padding:80px 60px;text-align:center;page-break-after:always;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cover h1{font-size:42pt;border:none;color:#fff;margin:0 0 8px;letter-spacing:-0.02em}
+.cover-am{font-size:26pt;opacity:.85;margin-bottom:20px}
+.cover-sub{font-size:13pt;opacity:.75;margin-bottom:50px}
+.cover-div{width:80px;height:3px;background:rgba(255,255,255,.4);margin:0 auto 50px;border-radius:2px}
+.cover table{border:none;background:none;box-shadow:none}
+.cover td{border:none;background:none!important;padding:4px 14px;opacity:.85;font-size:10pt}
+.cover td:first-child{opacity:.6;font-size:9pt;text-transform:uppercase;letter-spacing:.05em;text-align:right}
+.cover-slogan{margin-top:50px;font-size:9pt;font-style:italic;opacity:.55;max-width:420px}
+.content{max-width:780px;margin:0 auto;padding:50px 60px}
+h1{font-size:20pt;font-weight:700;color:#D9755E;margin:52px 0 18px;padding-bottom:10px;border-bottom:3px solid #D9755E;page-break-after:avoid}
+h2{font-size:13pt;font-weight:700;color:#303033;margin:32px 0 10px;padding-left:12px;border-left:4px solid #D9755E;page-break-after:avoid}
+h3{font-size:11.5pt;font-weight:600;color:#303033;margin:22px 0 8px}
+h4{font-size:9pt;font-weight:600;color:#77716C;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+p{margin:0 0 12px}
+strong{font-weight:600}
+em{font-style:italic}
+ul,ol{margin:10px 0 16px 22px}
+li{margin-bottom:5px}
+code{font-family:Consolas,'Courier New',monospace;font-size:8.5pt;background:#FCF8F1;border:1px solid #E8DED3;padding:1px 5px;border-radius:3px;color:#B85A42}
+pre{background:#303033;color:#E2E8F0;border-radius:8px;padding:16px 20px;margin:14px 0 20px;overflow-x:auto;font-size:8pt;line-height:1.6;page-break-inside:avoid}
+pre code{background:none;border:none;padding:0;color:inherit;font-size:inherit}
+table{width:100%;border-collapse:collapse;margin:12px 0 18px;font-size:9.5pt;page-break-inside:avoid;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+thead{background:#D9755E;color:#fff}
+th{padding:9px 13px;text-align:left;font-weight:600;font-size:9pt}
+td{padding:8px 13px;border-bottom:1px solid #E8DED3;vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:#FCF8F1}
+blockquote{border-left:4px solid #A8B6A0;background:#FCF8F1;margin:14px 0;padding:10px 16px;border-radius:0 6px 6px 0;font-style:italic;color:#77716C;font-size:10pt}
+hr{border:none;border-top:1px solid #E8DED3;margin:36px 0}
+@page{size:A4;margin:2.2cm 2.5cm 2.8cm 2.5cm}
+@page:first{margin:0}
+@media print{h1{page-break-before:always}.cover h1{page-break-before:avoid}pre,table,blockquote{page-break-inside:avoid}}
+@media screen{body{background:#e8e8e8}.content{background:#fff;box-shadow:0 2px 20px rgba(0,0,0,.12);margin:24px auto;border-radius:4px}.cover{border-radius:4px;margin:24px auto;max-width:780px;min-height:80vh}}
+</style>
+</head>
+<body>
+<div class="cover">
+  <h1>Sidra</h1>
+  <div class="cover-am">ስድራ</div>
+  <div class="cover-sub">Parenting and Family Support Platform<br>Full-Stack Web Application Documentation</div>
+  <div class="cover-div"></div>
+  <table>
+    <tr><td>Team</td><td>Beimenet &amp; Amanuel</td></tr>
+    <tr><td>Stack</td><td>PostgreSQL · Express · React · Node.js</td></tr>
+    <tr><td>Database</td><td>sidra_db · 7 tables</td></tr>
+    <tr><td>Tests</td><td>157 passing assertions</td></tr>
+    <tr><td>Year</td><td>2025 – 2026</td></tr>
+  </table>
+  <div class="cover-slogan">"ቤተሰብ ማለት ሀገር ነው፤ ቤተሰብን ማስተማር ሀገርን ማስተማር ነው።"</div>
+</div>
+<div class="content"><h1>Sidra (ስድራ) — Parenting and Family Support Platform</h1>
+<h2>Full-Stack Web Application — Project Documentation</h2>
+
+<hr>
+
+<p><strong>Project Name:</strong> Sidra (ስድራ)  </p>
+<p><strong>Platform Type:</strong> Full-Stack Web Application (PERN Stack)  </p>
+<p><strong>Development Team:</strong> Beimenet &amp; Amanuel  </p>
+<p><strong>Academic Year:</strong> 2025–2026  </p>
+<p><strong>Version:</strong> 1.0  </p>
+<p><strong>Repository:</strong> GitHub (main branch)</p>
+
+<hr>
+
+<h2>ACKNOWLEDGMENT</h2>
+
+<p>We would like to express our sincere gratitude to everyone who supported and contributed to the development of Sidra.</p>
+
+<p>To our instructors and supervisors, thank you for your guidance, constructive feedback, and encouragement throughout the development process. Your expertise helped shape a more robust and thoughtful application.</p>
+
+<p>To our peers who participated in user testing and provided feedback on the interface and user experience, your insights were invaluable.</p>
+
+<p>To the open-source community — the maintainers of React, Express, PostgreSQL, Tailwind CSS, and Vite — whose tools made this project possible.</p>
+
+<p>Finally, to every parent and caregiver who shared their challenges and aspirations, your stories gave this project its purpose. Sidra was built for you.</p>
+
+<p><em>"ቤተሰብ ማለት ሀገር ነው፤ ቤተሰብን ማስተማር ሀገርን ማስተማር ነው።"</em>  </p>
+<p><em>"Family is the nation; to educate the family is to educate the nation."</em></p>
+
+<hr>
+
+<h2>ABSTRACT</h2>
+
+<p>Sidra (ስድራ) is a full-stack parenting education and family-support web platform built using the PERN stack (PostgreSQL, Express.js, React.js, and Node.js). The platform is designed to address the information gap faced by parents and caregivers in Ethiopia and the diaspora by providing structured educational courses, access to verified child-development professionals, curated learning resources, and community support features.</p>
+
+<p>The system implements a role-based access control model with three primary account types: parents and caregivers, professionals, and administrators. Authentication is handled through server-managed sessions with HttpOnly cookies and bcrypt password hashing, providing security without the vulnerabilities associated with client-side token storage.</p>
+
+<p>The frontend, built with React 18.3 and Vite 5.4, delivers a fully responsive, accessible, and bilingual (English/Amharic) user interface styled with Tailwind CSS. The backend, built with Node.js and Express.js, exposes a RESTful API connected to a PostgreSQL database containing seven normalized tables.</p>
+
+<p>At the time of this documentation, the frontend foundation is complete with all major user-facing pages implemented. The backend authentication system, database schema, and admin dashboard APIs are fully operational. Course management, professional directory, and enrollment APIs are partially implemented, with the remaining modules under active development.</p>
+
+<p>This document provides a comprehensive technical reference of the system's architecture, implementation, testing, and current status, suitable for academic evaluation and project handover.</p>
+
+<p><strong>Keywords:</strong> Parenting platform, PERN stack, React.js, Node.js, PostgreSQL, authentication, role-based access, family support, educational technology, Ethiopia.</p>
+
+<hr>
+
+<h2>TABLE OF CONTENTS</h2>
+
+<ul><li>Chapter 1: Introduction</li><li>Chapter 2: System Requirements</li><li>Chapter 3: System Analysis and Design</li><li>Chapter 4: User Interface Design</li><li>Chapter 5: System Implementation</li><li>Chapter 6: Testing and Debugging</li><li>Chapter 7: Deployment</li><li>Chapter 8: Team Collaboration</li><li>Chapter 9: Challenges and Solutions</li><li>Chapter 10: Conclusion and Future Enhancements</li><li>References</li><li>Appendices</li></ul>
+
+<hr>
+
+<h2>LIST OF TABLES</h2>
+
+<table><thead><tr><th>Table</th><th>Title</th></tr></thead><tbody><tr><td>Table 2.1</td><td>Functional Requirements</td></tr><tr><td>Table 2.2</td><td>Non-Functional Requirements</td></tr><tr><td>Table 2.3</td><td>User Roles and Permissions</td></tr><tr><td>Table 2.4</td><td>Software Requirements</td></tr><tr><td>Table 3.1</td><td>Database Tables Summary</td></tr><tr><td>Table 3.2</td><td>API Endpoint Reference</td></tr><tr><td>Table 5.1</td><td>Frontend Pages and Routes</td></tr><tr><td>Table 5.2</td><td>Backend Dependencies</td></tr><tr><td>Table 6.1</td><td>Authentication Test Cases</td></tr><tr><td>Table 6.2</td><td>Profile Management Test Cases</td></tr><tr><td>Table 6.3</td><td>Admin API Test Cases</td></tr><tr><td>Table 7.1</td><td>Environment Variables</td></tr></tbody></table>
+
+<hr>
+
+<h2>LIST OF FIGURES</h2>
+
+<table><thead><tr><th>Figure</th><th>Title</th></tr></thead><tbody><tr><td>Figure 3.1</td><td>PERN Stack Architecture Diagram</td></tr><tr><td>Figure 3.2</td><td>Entity-Relationship Diagram</td></tr><tr><td>Figure 3.3</td><td>Authentication Flow Diagram</td></tr><tr><td>Figure 3.4</td><td>Frontend Component Tree</td></tr><tr><td>Figure 5.1</td><td>Project Folder Structure</td></tr></tbody></table>
+
+<hr>
+
+<hr>
+
+<h1>CHAPTER 1: INTRODUCTION</h1>
+
+<h2>1.1 Project Background</h2>
+
+<p>Raising children is one of the most demanding responsibilities a person can undertake. Yet in Ethiopia and across the Ethiopian diaspora, parents and caregivers often navigate this journey without access to reliable, structured, or culturally relevant educational resources. The existing landscape of parenting support is fragmented: general-purpose internet searches yield contradictory advice; formal consultations with child-development professionals are expensive and geographically inaccessible; and community knowledge, while valuable, is rarely organized or verified.</p>
+
+<p>Sidra (ስድራ) was conceived in response to this gap. The name comes from Amharic and carries meaning rooted in family, home, and community — a foundation that reflects the platform's purpose. The project set out to create a digital platform that combines structured learning, verified professional guidance, inclusive resources, and community connection in a single, accessible environment.</p>
+
+<h2>1.2 Problem Statement</h2>
+
+<p>Parents and caregivers in Ethiopia and the diaspora face the following specific challenges:</p>
+
+<ul><li><strong>Information overload and unreliability.</strong> Parenting advice on the internet is abundant but inconsistent and often not evidence-based. There is no curated, trustworthy central source of parenting education relevant to Ethiopian family contexts.</li></ul>
+
+<ul><li><strong>Limited access to professionals.</strong> Finding qualified child-development professionals — pediatricians, therapists, speech-language pathologists, psychologists — is difficult. Parents have no structured way to verify credentials or discover specialists appropriate for their child's needs.</li></ul>
+
+<ul><li><strong>Lack of inclusive resources.</strong> Families supporting children with developmental differences, learning disabilities, or neurodivergent conditions face particular difficulties. Resources tailored to these families in an Ethiopian context are almost nonexistent.</li></ul>
+
+<ul><li><strong>Fragmented learning.</strong> Educational content for parents is scattered across blogs, social media posts, and short articles without structure or progression. There is no pathway for a parent to learn systematically.</li></ul>
+
+<h2>1.3 Proposed Solution</h2>
+
+<p>Sidra addresses these problems by building a unified digital platform offering:</p>
+
+<ul><li><strong>Structured educational courses</strong> organized into topics, levels, and lesson sequences, with support for video, reading, and downloadable content.</li><li><strong>A verified professional directory</strong> where administrators review and approve child-development professionals before their profiles become publicly visible.</li><li><strong>Curated learning resources</strong> including external articles, guides, and tools from reputable organizations.</li><li><strong>Community and communication features</strong> including parent circles and direct messaging (partially implemented).</li><li><strong>An administrator dashboard</strong> for platform management, content governance, user management, and professional verification.</li></ul>
+
+<h2>1.4 Project Motivation</h2>
+
+<p>The project was motivated by the conviction that parenting education should be affordable, accessible, and culturally grounded. Ethiopia has one of the youngest populations in the world, yet parenting support infrastructure lags significantly behind global standards. Sidra represents an attempt to close this gap using modern web technology.</p>
+
+<p>The choice of the PERN stack reflects a commitment to using free, open-source, and widely supported technologies that can be maintained, extended, and deployed at low cost — making the platform viable for a non-profit or social-impact context.</p>
+
+<h2>1.5 Objectives</h2>
+
+<h3>General Objective</h3>
+<p>To design and develop a full-stack parenting education and family-support web platform that provides structured courses, professional guidance, and community features for parents and caregivers.</p>
+
+<h3>Specific Objectives</h3>
+<ul><li>Design and implement a normalized PostgreSQL relational database capable of supporting users, courses, lessons, enrollments, professional profiles, and session management.</li><li>Build a secure authentication system using bcrypt password hashing and server-managed HttpOnly session cookies.</li><li>Implement role-based access control distinguishing between parents, professionals, and administrators at both the frontend route level and backend API level.</li><li>Develop a responsive, accessible, bilingual (English/Amharic) React frontend covering all core user journeys.</li><li>Build an administrative backend API supporting user management, professional approval, course management, and platform statistics.</li><li>Create a community features module including circles and direct messaging.</li><li>Establish a test suite covering authentication, profile management, and admin operations.</li></ul>
+
+<h2>1.6 Scope and Limitations</h2>
+
+<h3>In Scope</h3>
+<ul><li>User registration, login, logout, and profile management</li><li>Course catalog browsing, course detail pages, and lesson display</li><li>Professional directory with admin-controlled verification</li><li>Admin dashboard with user management, professional approval, and platform statistics</li><li>Community circles and clinical chat interface (frontend prototype)</li><li>Backend authentication, session management, and admin APIs</li><li>Database schema design and migration</li></ul>
+
+<h3>Out of Scope (as of this documentation)</h3>
+<ul><li>Payment gateway integration (Telebirr, Chapa) — designed but not connected</li><li>Email delivery and password reset</li><li>Real-time chat using WebSockets (current implementation uses static demo data)</li><li>Mobile native applications</li><li>Video hosting infrastructure</li><li>Deployment to a production server</li></ul>
+
+<h2>1.7 Target Users</h2>
+
+<table><thead><tr><th>User Type</th><th>Description</th></tr></thead><tbody><tr><td>**Parents and Caregivers**</td><td>Mothers, fathers, legal guardians, and other caregivers seeking structured parenting education and professional guidance. Primary users.</td></tr><tr><td>**Child-Development Professionals**</td><td>Pediatricians, therapists, psychologists, speech-language pathologists, and other specialists who apply to list their services on the platform.</td></tr><tr><td>**Platform Administrators**</td><td>Staff responsible for content management, user oversight, professional verification, and platform governance.</td></tr><tr><td>**Visitors**</td><td>Unauthenticated users who can browse public course listings and the professional directory.</td></tr></tbody></table>
+
+<hr>
+
+<h1>CHAPTER 2: SYSTEM REQUIREMENTS</h1>
+
+<h2>2.1 Functional Requirements</h2>
+
+<p><strong>Table 2.1 — Functional Requirements</strong></p>
+
+<table><thead><tr><th>ID</th><th>Requirement</th><th>Priority</th></tr></thead><tbody><tr><td>FR-01</td><td>Visitors can browse the public homepage, course catalog, and professional directory without creating an account.</td><td>High</td></tr><tr><td>FR-02</td><td>Users can register with their full name, email, password, and family role.</td><td>High</td></tr><tr><td>FR-03</td><td>Users can log in with email and password and receive a server-managed session cookie.</td><td>High</td></tr><tr><td>FR-04</td><td>Users can log out, which destroys the server-side session and clears the cookie.</td><td>High</td></tr><tr><td>FR-05</td><td>Users can view and edit their profile, including their name and family role.</td><td>High</td></tr><tr><td>FR-06</td><td>Authenticated users can change their password after verifying the current password.</td><td>High</td></tr><tr><td>FR-07</td><td>Authenticated users can browse and enroll in courses.</td><td>High</td></tr><tr><td>FR-08</td><td>Enrolled users can track their lesson completion progress.</td><td>High</td></tr><tr><td>FR-09</td><td>Professionals can register and submit profile applications for admin review.</td><td>Medium</td></tr><tr><td>FR-10</td><td>Visitors and registered users can browse the verified professional directory.</td><td>Medium</td></tr><tr><td>FR-11</td><td>Administrators can view, search, filter, and paginate all registered users.</td><td>High</td></tr><tr><td>FR-12</td><td>Administrators can activate or deactivate user accounts.</td><td>High</td></tr><tr><td>FR-13</td><td>Administrators can change user roles.</td><td>High</td></tr><tr><td>FR-14</td><td>Administrators can approve or reject professional applications, with an optional rejection reason.</td><td>High</td></tr><tr><td>FR-15</td><td>Administrators can view platform statistics including total users, professionals, courses, and enrollments.</td><td>High</td></tr><tr><td>FR-16</td><td>Administrators can view recent user registrations and platform activity.</td><td>Medium</td></tr><tr><td>FR-17</td><td>Public registration must never allow the `admin` role to be assigned.</td><td>Critical</td></tr><tr><td>FR-18</td><td>Inactive accounts must be unable to log in and must have all active sessions immediately invalidated.</td><td>Critical</td></tr></tbody></table>
+
+<h2>2.2 Non-Functional Requirements</h2>
+
+<p><strong>Table 2.2 — Non-Functional Requirements</strong></p>
+
+<table><thead><tr><th>ID</th><th>Requirement</th><th>Category</th></tr></thead><tbody><tr><td>NFR-01</td><td>The application must be responsive and usable on mobile, tablet, and desktop.</td><td>Usability</td></tr><tr><td>NFR-02</td><td>All forms must validate input on the client and server side.</td><td>Reliability</td></tr><tr><td>NFR-03</td><td>Password hashes must use bcrypt with a work factor of 12.</td><td>Security</td></tr><tr><td>NFR-04</td><td>Session cookies must be HttpOnly, SameSite=Lax, and Secure in production.</td><td>Security</td></tr><tr><td>NFR-05</td><td>Password hashes and session tokens must never be included in API responses.</td><td>Security</td></tr><tr><td>NFR-06</td><td>All database queries must use parameterized values to prevent SQL injection.</td><td>Security</td></tr><tr><td>NFR-07</td><td>The platform must meet WCAG 2.1 Level AA accessibility guidelines where feasible.</td><td>Accessibility</td></tr><tr><td>NFR-08</td><td>All pages must use semantic HTML and visible keyboard-focus states.</td><td>Accessibility</td></tr><tr><td>NFR-09</td><td>The system must handle API errors gracefully with user-friendly messages.</td><td>Reliability</td></tr><tr><td>NFR-10</td><td>The production build must complete without errors (verified by `vite build`).</td><td>Reliability</td></tr><tr><td>NFR-11</td><td>Sensitive credentials must be stored in environment variables and never committed to version control.</td><td>Security</td></tr></tbody></table>
+
+<h2>2.3 User Roles and Permissions</h2>
+
+<p><strong>Table 2.3 — User Roles and Permissions</strong></p>
+
+<table><thead><tr><th>Permission</th><th>Visitor</th><th>Parent/Caregiver</th><th>Professional</th><th>Admin</th></tr></thead><tbody><tr><td>Browse public courses</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>Browse professional directory</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>Register and log in</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr><tr><td>Enroll in courses</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>Track lesson progress</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>Edit own profile</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>Submit professional application</td><td>❌</td><td>❌</td><td>✅</td><td>—</td></tr><tr><td>Access admin dashboard</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr><tr><td>Manage users</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr><tr><td>Approve/reject professionals</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr><tr><td>Manage courses and content</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr></tbody></table>
+
+<blockquote>t; Note: The `admin` role can only be assigned directly in the database or through the admin role-management endpoint. It is permanently blocked via public registration.</blockquote>
+
+<h2>2.4 Account Role vs. Family Role</h2>
+
+<p>The system distinguishes two separate role systems:</p>
+
+<ul><li><strong>Account Role</strong> (<code>users.role</code>): Controls platform permissions. Values: <code>mother</code>, <code>father</code>, <code>legal_guardian</code>, <code>professional</code>, <code>admin</code>.</li><li><strong>Family Role</strong>: A user-preference field identifying the user's relationship to the child they care for. Values overlap with account role but serve display and avatar purposes, not authorization.</li></ul>
+
+<p>This separation ensures that displaying a "Mother" avatar does not grant or imply any specific platform permissions.</p>
+
+<h2>2.5 Hardware and Software Requirements</h2>
+
+<p><strong>Development Environment</strong></p>
+<ul><li>Operating System: Windows 11 / macOS / Linux</li><li>RAM: 4 GB minimum, 8 GB recommended</li><li>Disk: 1 GB for project files and dependencies</li><li>Internet connection for npm package installation</li></ul>
+
+<p><strong>Software Requirements Table 2.4</strong></p>
+
+<table><thead><tr><th>Software</th><th>Version</th><th>Purpose</th></tr></thead><tbody><tr><td>Node.js</td><td>v18 LTS or later</td><td>Backend runtime and build tools</td></tr><tr><td>npm</td><td>v9 or later</td><td>Package management</td></tr><tr><td>PostgreSQL</td><td>v16 / v18</td><td>Database server</td></tr><tr><td>pgAdmin 4</td><td>Any current</td><td>Database GUI administration</td></tr><tr><td>Git</td><td>2.x</td><td>Version control</td></tr><tr><td>A modern browser</td><td>Chrome, Firefox, Edge</td><td>Frontend testing</td></tr></tbody></table>
+
+<hr>
+
+<h1>CHAPTER 3: SYSTEM ANALYSIS AND DESIGN</h1>
+
+<h2>3.1 Overall System Architecture</h2>
+
+<p>Sidra follows a standard three-tier client-server architecture:</p>
+
+<pre><code>
+┌─────────────────────────────────────────────────────────────┐
+
+│                    USER'S BROWSER                            │
+
+│                                                             │
+
+│   React 18 SPA (Vite)   ←── Tailwind CSS styling           │
+
+│   React Router v6       ←── Client-side navigation          │
+
+│   AuthContext           ←── Session state management        │
+
+│   api.js (fetch)        ←── HTTP requests with cookies      │
+
+└──────────────────┬──────────────────────────────────────────┘
+
+                   │  HTTP/REST (JSON)  credentials: 'include'
+
+                   │  Vite dev proxy → localhost:5000
+
+                   ▼
+
+┌─────────────────────────────────────────────────────────────┐
+
+│                    EXPRESS.JS API SERVER                     │
+
+│                    (Node.js v18+, port 5000)                 │
+
+│                                                             │
+
+│   CORS + cookieParser + express.json                        │
+
+│   Routes: /api/auth, /api/courses, /api/enrollments,        │
+
+│           /api/professionals, /api/admin, /api/health        │
+
+│   Middleware: authenticate.js, requireRole.js               │
+
+│   Models: userModel, courseModel, professionalModel, etc.   │
+
+│   Utils: password.js (bcrypt), session.js (crypto)          │
+
+└──────────────────┬──────────────────────────────────────────┘
+
+                   │  pg Pool — parameterized queries
+
+                   ▼
+
+┌─────────────────────────────────────────────────────────────┐
+
+│                    POSTGRESQL DATABASE                       │
+
+│                    (sidra_db, port 5432)                     │
+
+│                                                             │
+
+│   Tables: users, sessions, courses, lessons,                │
+
+│           enrollments, lesson_progress,                      │
+
+│           professional_profiles                             │
+
+└─────────────────────────────────────────────────────────────┘
+
+</code></pre>
+
+<p><strong>Figure 3.1 — PERN Stack Architecture Diagram</strong></p>
+
+<h2>3.2 PERN Stack Component Responsibilities</h2>
+
+<table><thead><tr><th>Layer</th><th>Technology</th><th>Responsibility</th></tr></thead><tbody><tr><td>**P**</td><td>PostgreSQL 18</td><td>Persistent relational data storage; enforces constraints, foreign keys, and uniqueness at the database level</td></tr><tr><td>**E**</td><td>Express.js 4.19</td><td>REST API routing, middleware orchestration, authentication enforcement, error handling</td></tr><tr><td>**R**</td><td>React.js 18.3</td><td>Single-page application UI, client-side routing, component state management</td></tr><tr><td>**N**</td><td>Node.js 18+</td><td>Server runtime for Express; used for the build system (via Vite) on the frontend</td></tr></tbody></table>
+
+<h2>3.3 Frontend–Backend Communication</h2>
+
+<p>The frontend communicates with the backend exclusively through HTTP REST API calls handled by <code>client/src/services/api.js</code>. All requests include <code>credentials: 'include'</code> so the browser automatically attaches the <code>sid</code> session cookie.</p>
+
+<p>During development, a Vite proxy (<code>vite.config.js</code>) forwards all <code>/api/*</code> requests from <code>http://localhost:5173</code> to <code>http://localhost:5000</code>, eliminating CORS complexity and ensuring the session cookie operates on the same origin.</p>
+
+<pre><code>
+// vite.config.js — proxy configuration
+
+server: {
+
+  proxy: {
+
+    '/api': {
+
+      target: 'http://localhost:5000',
+
+      changeOrigin: true,
+
+    },
+
+  },
+
+}
+
+</code></pre>
+
+<h2>3.4 Database Architecture</h2>
+
+<p>The database contains seven tables in the <code>public</code> schema of the <code>sidra_db</code> PostgreSQL database. All primary keys are UUIDs generated by <code>gen_random_uuid()</code> from the <code>pgcrypto</code> extension, preventing ID enumeration.</p>
+
+<p><strong>Table 3.1 — Database Tables Summary</strong></p>
+
+<table><thead><tr><th>Table</th><th>Rows Purpose</th><th>Key Relationships</th></tr></thead><tbody><tr><td>`users`</td><td>All account holders</td><td>Referenced by all user-owned tables</td></tr><tr><td>`sessions`</td><td>Server-managed auth sessions</td><td>FK → users (CASCADE delete)</td></tr><tr><td>`professional_profiles`</td><td>Professional directory entries</td><td>FK → users (CASCADE delete); UNIQUE user_id</td></tr><tr><td>`courses`</td><td>Course catalog</td><td>Referenced by lessons, enrollments</td></tr><tr><td>`lessons`</td><td>Individual lessons per course</td><td>FK → courses (CASCADE delete); UNIQUE (course_id, position)</td></tr><tr><td>`enrollments`</td><td>User course enrollments</td><td>FK → users + courses; UNIQUE (user_id, course_id)</td></tr><tr><td>`lesson_progress`</td><td>Per-user lesson completion</td><td>FK → users + lessons; UNIQUE (user_id, lesson_id)</td></tr></tbody></table>
+
+<h2>3.5 Entity-Relationship Diagram</h2>
+
+<pre><code>
+USERS ──────────────── SESSIONS
+
+  │    1              0..*    (server-managed auth sessions)
+
+  │
+
+  ├──────────────── PROFESSIONAL_PROFILES
+
+  │    1              0..1    (one profile per professional)
+
+  │
+
+  ├──────────────── ENROLLMENTS
+
+  │    1              0..*    ──── COURSES
+
+  │                                  │    1
+
+  │                                  ├──── LESSONS
+
+  │                                  │       │    1
+
+  └──────────────── LESSON_PROGRESS  └───────┘    0..*
+
+       1              0..*
+
+</code></pre>
+
+<p><strong>Figure 3.2 — Entity-Relationship Diagram (simplified)</strong></p>
+
+<p>Key integrity rules enforced at the database level:</p>
+<ul><li><code>UNIQUE (user_id, course_id)</code> on <code>enrollments</code> — prevents duplicate enrollment</li><li><code>UNIQUE (user_id, lesson_id)</code> on <code>lesson_progress</code> — prevents duplicate progress records</li><li><code>UNIQUE (course_id, position)</code> on <code>lessons</code> — enforces ordered positioning within a course</li><li><code>CHECK (role IN (...))</code> on <code>users</code> — restricts role values to the defined set</li><li><code>ON DELETE CASCADE</code> propagates user and course deletions to all dependent records</li></ul>
+
+<h2>3.6 Authentication and Authorization Flow</h2>
+
+<p>The authentication system uses server-managed sessions rather than stateless JWTs:</p>
+
+<pre><code>
+REGISTRATION FLOW
+
+─────────────────
+
+Client                    Server                    Database
+
+  │                          │                         │
+
+  ├─ POST /api/auth/register ─►                        │
+
+  │   { full_name, email,     │                        │
+
+  │     password, role }      ├─ Validate input        │
+
+  │                           ├─ Block admin role       │
+
+  │                           ├─ Check email unique ───►
+
+  │                           │                 ◄─ OK   │
+
+  │                           ├─ bcrypt.hash(pw, 12)    │
+
+  │                           ├─ INSERT users ─────────►
+
+  │                           ├─ crypto.randomBytes(32) │
+
+  │                           ├─ INSERT sessions ──────►
+
+  │                           ├─ Set-Cookie: sid=...    │
+
+  │◄─ 201 { user } (safe) ───┤                         │
+
+  │   (no password_hash)      │                         │
+
+</code></pre>
+
+<p><strong>Figure 3.3 — Authentication Flow Diagram</strong></p>
+
+<p><strong>Session validation on every protected request:</strong></p>
+
+<pre><code>
+authenticate middleware:
+
+  1. Read sid cookie from request
+
+  2. If absent → 401
+
+  3. SELECT * FROM sessions WHERE id = sid AND expires_at > NOW()
+
+  4. If not found → 401, clear stale cookie
+
+  5. SELECT * FROM users WHERE id = session.user_id AND is_active = TRUE
+
+  6. If not found or inactive → 401, delete session, clear cookie
+
+  7. Attach user to req.user
+
+  8. Call next()
+
+</code></pre>
+
+<p>This design ensures that deactivated accounts are immediately locked out without waiting for token expiry.</p>
+
+<h2>3.7 System Security Considerations</h2>
+
+<table><thead><tr><th>Concern</th><th>Implementation</th></tr></thead><tbody><tr><td>Password storage</td><td>bcrypt with work factor 12 via `bcryptjs`</td></tr><tr><td>Session storage</td><td>HttpOnly, SameSite=Lax, Secure (production) cookies</td></tr><tr><td>SQL injection</td><td>All queries use `pg` parameterized values (`$1, $2, …`)</td></tr><tr><td>Admin role escalation</td><td>`REGISTRATION_ROLES` whitelist blocks `admin` at registration; `PUBLIC_ROLES` in `updateUser()` blocks self-promotion</td></tr><tr><td>Sensitive API fields</td><td>`password_hash` never returned in any response; uses `SAFE_COLS` constant</td></tr><tr><td>Last-admin protection</td><td>`countActiveAdmins()` prevents demotion of the last active administrator</td></tr><tr><td>Session invalidation</td><td>Logout deletes the session row — cookie deletion alone is insufficient</td></tr><tr><td>CORS</td><td>`credentials: true` with exact origin (`CLIENT_ORIGIN`), never wildcard `*`</td></tr></tbody></table>
+
+<hr>
+
+<h1>CHAPTER 4: USER INTERFACE DESIGN</h1>
+
+<h2>4.1 Design System</h2>
+
+<p>Sidra uses a consistent design system implemented in Tailwind CSS. The palette is warm and professional, appropriate for a family-support platform.</p>
+
+<p><strong>Color Palette</strong></p>
+
+<table><thead><tr><th>Token</th><th>Hex Value</th><th>Usage</th></tr></thead><tbody><tr><td>`cream`</td><td>`#FCF8F1`</td><td>Page and section backgrounds</td></tr><tr><td>`terracotta`</td><td>`#D9755E`</td><td>Primary buttons, links, active states</td></tr><tr><td>`terracotta-hover`</td><td>`#C5634D`</td><td>Hover/pressed states</td></tr><tr><td>`sage`</td><td>`#A8B6A0`</td><td>Tags, badges, secondary accents</td></tr><tr><td>`charcoal`</td><td>`#303033`</td><td>Primary text and headings</td></tr><tr><td>`warm-gray`</td><td>`#77716C`</td><td>Secondary text, captions</td></tr><tr><td>`border`</td><td>`#E8DED3`</td><td>Borders and dividers</td></tr><tr><td>White</td><td>`#FFFFFF`</td><td>Cards, modals, inputs</td></tr></tbody></table>
+
+<p><strong>Typography:</strong> Inter (Google Fonts) — clean, readable, and accessible across age groups.</p>
+
+<p><strong>Reusable CSS classes defined in <code>index.css</code>:</strong></p>
+<ul><li><code>.btn-primary</code> — terracotta fill button</li><li><code>.btn-secondary</code> — terracotta outline button</li><li><code>.card</code> — white rounded card with border and shadow</li><li><code>.tag</code> — sage green category pill</li><li><code>.section-container</code> — max-width centered content area</li></ul>
+
+<h2>4.2 Homepage (`/`)</h2>
+
+<p>The homepage serves as the primary entry point for all users. It is composed of seven sections arranged vertically:</p>
+
+<ul><li><strong>Sticky Navbar</strong> — Logo (logo.jpg), bilingual brand name "Sidra | ስድራ", navigation links (Home, Courses, Professionals, Resources, Circles &amp; Chat, About Us), auth-aware controls (Login/Register for guests, avatar + Log Out for authenticated users).</li><li><strong>Hero Section</strong> — Headline in Amharic, supporting text, two CTAs (Explore Courses, Browse Professionals), and a hero image (Capture.PNG).</li><li><strong>How Sidra Supports Families</strong> — Four feature highlight cards with icons: Trusted Courses, Expert Professionals, Inclusive Resources, Track Your Progress.</li><li><strong>Featured Courses</strong> — Grid of three demo course cards with category, level, price, and a "View Course" link.</li><li><strong>Professional Directory Preview</strong> — Three sample professional cards with avatar, specialty, and a "View Profile" link.</li><li><strong>Call-to-Action</strong> — Full-width terracotta section with registration prompt.</li><li><strong>Footer</strong> — Three-column layout with brand, navigation links, legal links, and social media icons (Instagram, Facebook, TikTok, YouTube, Telegram — currently linked to platform homepages as placeholders).</li></ul>
+
+<h2>4.3 Courses Page (`/courses`)</h2>
+
+<p>The Courses page provides a fully functional catalog browser with:</p>
+<ul><li><strong>Search</strong> by title, description, and category (live filtering)</li><li><strong>Filters</strong> by category (7 options), level (Beginner/Intermediate/Advanced), price (All/Free/Paid), and format</li><li><strong>Sort</strong> options: Recommended, Price Low→High, Price High→Low, Newest</li><li><strong>Active filter chips</strong> with individual remove buttons and Reset All</li><li><strong>Results count</strong> with <code>aria-live</code> announcement</li><li><strong>Desktop sidebar + mobile drawer</strong> for filter controls</li><li><strong>Course card grid</strong> (1→2→3 columns responsive)</li><li><strong>Empty state</strong> when no results match</li></ul>
+
+<p>Current data source: <code>client/src/data/courses.js</code> — 8 demo courses. Real API integration is planned.</p>
+
+<h2>4.4 Course Detail Page (`/courses/:id`)</h2>
+
+<p>Each course detail page includes:</p>
+<ul><li>Breadcrumb navigation (Home → Courses → Course Title)</li><li>Course header with category/level/format/duration metadata</li><li>Enrollment card (right sidebar) with price in ETB, enroll button, course highlights</li><li>Video lesson placeholder</li><li>Learning objectives (bulleted list)</li><li>Intended audience description</li><li>Accordion curriculum (modules/lessons with type indicators)</li><li>External learning resources (links to WHO, CDC, AAP, UNICEF, NHS, etc.)</li><li>Payment modal (demo — no real payment processed)</li></ul>
+
+<p><strong>Enrollment button behavior:</strong></p>
+<ul><li>Unauthenticated users → redirected to <code>/login</code> with <code>state.from</code> set to return after login</li><li>Authenticated users → "Enrollment coming soon" notice (API pending)</li></ul>
+
+<h2>4.5 Login Page (`/login`)</h2>
+
+<p>Centered card layout with:</p>
+<ul><li>Email and password fields with validation</li><li>Generic error message on failure (does not reveal which field failed)</li><li>Redirect to the originally requested page after login (<code>location.state.from</code>)</li><li>Link to registration</li></ul>
+
+<h2>4.6 Registration Page (`/register`)</h2>
+
+<ul><li>Full name, email, password (min 8 chars, requires letter + number), confirm password</li><li><strong>Family role selector</strong> — four illustrated selectable cards: Mother, Father, Legal Guardian, Other Caregiver</li><li>Role cards use radio semantics with visible selected-tick indicator</li><li>Client-side and server-side validation aligned</li><li>Field-level error surfacing from backend (e.g., duplicate email)</li></ul>
+
+<h2>4.7 Profile Page (`/profile`)</h2>
+
+<p>Protected route (requires authentication).</p>
+
+<p><strong>View mode:</strong> Displays role-based circular avatar, full name, email, family role badge, and Edit Profile button.</p>
+
+<p><strong>Edit mode:</strong> Editable name field, read-only email (with explanation), four-card role selector, Save/Cancel buttons, success banner on save.</p>
+
+<p><strong>Role-based avatars:</strong> The <code>RoleAvatar</code> component (<code>components/common/RoleAvatar.jsx</code>) renders a distinct inline SVG illustration for each role (Mother, Father, Legal Guardian, Other Caregiver) with fallback. Used in the navbar (42px) and profile page (80px).</p>
+
+<h2>4.8 Professional Directory (`/professionals`)</h2>
+
+<p>Displays a grid of cards for verified professionals. Each card shows name, specialty, qualifications excerpt, and a "View Profile" link. Individual profile pages are accessible at <code>/professionals/:id</code>.</p>
+
+<h2>4.9 Admin Dashboard (`/admin/*`)</h2>
+
+<p>The admin dashboard uses a separate full-page layout (<code>DashboardLayout</code>) that bypasses the public Navbar and Footer. It consists of:</p>
+
+<p><strong>Sidebar:</strong> Charcoal background with 8 navigation items (Overview, User Management, Professional Approvals, Course Management, Categories, Resource Management, Reports, Settings), active-page highlighting, and profile/logout in the footer.</p>
+
+<p><strong>Header:</strong> Current page title, breadcrumb, admin avatar.</p>
+
+<p><strong>Admin Overview (<code>/admin</code>):</strong></p>
+<ul><li>9 stat cards (Total Users, Active Users, Professionals, Approved Pros, Pending Reviews, Courses, Mothers, Fathers, Legal Guardians) — populated from real database</li><li>Pending professional applications panel (live data)</li><li>Recent activity feed (registrations, enrollments, applications)</li><li>Quick action cards (Manage Users, Review Professionals, Manage Courses, Manage Resources)</li></ul>
+
+<p><strong>Admin Users (<code>/admin/users</code>):</strong></p>
+<ul><li>Paginated user table (15 per page)</li><li>Search by name/email, filter by role and status, sort by date</li><li>Activate/Deactivate buttons with confirmation dialogs</li><li>Role change dialog with dropdown</li><li>Self-modification disabled (cannot deactivate own account or change own role)</li><li>Toast notifications on success/failure</li></ul>
+
+<p><strong>Admin Professionals (<code>/admin/professionals</code>):</strong></p>
+<ul><li>List of pending professional applications</li><li>Expandable profile cards (qualifications, bio, submission date)</li><li>Approve and Reject buttons with confirmation dialogs</li><li>Rejection reason textarea</li><li>Toast notifications</li></ul>
+
+<h2>4.10 Community and Chat (`/circles`)</h2>
+
+<p>The Circles &amp; Chat page provides a three-column messaging interface:</p>
+<ul><li><strong>Left sidebar:</strong> Tab toggle (1-on-1 Care / Parent Circles), search, clinical contact list, community circles list</li><li><strong>Center:</strong> Chat messages view, attachments, message input with file attach and voice record buttons</li><li><strong>Right panel:</strong> Doctor information, upcoming session card, care plan checklist, specialist memo — collapsible</li><li><strong>Bottom banner:</strong> Live audio circle announcement — dismissible</li></ul>
+
+<p>Currently uses demo/mock data. Real-time functionality (WebSockets, live chat) is planned for a future phase.</p>
+
+<h2>4.11 Responsive Design</h2>
+
+<p>The application uses a mobile-first responsive approach via Tailwind CSS breakpoints:</p>
+
+<table><thead><tr><th>Breakpoint</th><th>Width</th><th>Layout Changes</th></tr></thead><tbody><tr><td>Mobile default</td><td>< 640px</td><td>Single column; hamburger nav</td></tr><tr><td>`sm`</td><td>≥ 640px</td><td>Two-column grids begin; filters visible</td></tr><tr><td>`md`</td><td>≥ 768px</td><td>Full desktop navbar; sidebar filters</td></tr><tr><td>`lg`</td><td>≥ 1024px</td><td>Three-column course grid</td></tr><tr><td>`xl`</td><td>≥ 1280px</td><td>Admin dashboard shows right panel</td></tr></tbody></table>
+
+<hr>
+
+<h1>CHAPTER 5: SYSTEM IMPLEMENTATION</h1>
+
+<h2>5.1 Project Folder Structure</h2>
+
+<pre><code>
+Sidra/
+
+├── client/                          ← React frontend (Vite)
+
+│   ├── public/
+
+│   ├── src/
+
+│   │   ├── assets/                  ← logo.jpg, Capture.PNG
+
+│   │   ├── components/
+
+│   │   │   ├── common/
+
+│   │   │   │   └── RoleAvatar.jsx   ← Role-based SVG avatar
+
+│   │   │   ├── courses/             ← CourseCard, SearchBar, filters, etc.
+
+│   │   │   ├── dashboard/           ← DashboardLayout, Sidebar, Header, etc.
+
+│   │   │   ├── home/                ← Hero, HowItWorks, FeaturedCourses, etc.
+
+│   │   │   └── layout/              ← Navbar.jsx, Footer.jsx
+
+│   │   ├── context/
+
+│   │   │   └── AuthContext.jsx      ← Auth state + API calls
+
+│   │   ├── data/
+
+│   │   │   └── courses.js           ← 8 demo courses
+
+│   │   ├── pages/                   ← All page components
+
+│   │   │   ├── admin/               ← 8 admin pages
+
+│   │   │   └── (13 other pages)
+
+│   │   ├── routes/
+
+│   │   │   └── AppRoutes.jsx        ← All routes + guards
+
+│   │   ├── services/
+
+│   │   │   └── api.js               ← Fetch wrapper + all API calls
+
+│   │   └── styles/
+
+│   │       └── index.css            ← Tailwind + global styles
+
+│   ├── vite.config.js               ← Dev proxy + asset config
+
+│   ├── tailwind.config.js           ← Custom colors/fonts
+
+│   └── package.json
+
+│
+
+├── server/                          ← Node.js + Express backend
+
+│   ├── src/
+
+│   │   ├── config/
+
+│   │   │   ├── db.js                ← pg Pool connection
+
+│   │   │   └── env.js               ← Centralized env vars
+
+│   │   ├── db/
+
+│   │   │   ├── schema.sql           ← 7-table schema
+
+│   │   │   └── migrate.js           ← Idempotent migration runner
+
+│   │   ├── middleware/
+
+│   │   │   ├── authenticate.js      ← Session validation
+
+│   │   │   ├── requireRole.js       ← Role-based access control
+
+│   │   │   ├── errorHandler.js      ← Centralized error handling
+
+│   │   │   └── notFound.js          ← 404 handler
+
+│   │   ├── models/                  ← DB query functions (6 models)
+
+│   │   ├── routes/                  ← Route handlers (5 routes)
+
+│   │   └── utils/
+
+│   │       ├── password.js          ← bcrypt helpers
+
+│   │       └── session.js           ← Session CRUD helpers
+
+│   ├── tests/                       ← 4 integration test suites
+
+│   ├── .env                         ← Local credentials (not committed)
+
+│   ├── .env.example                 ← Safe-to-commit template
+
+│   └── package.json
+
+│
+
+└── docs/                            ← Project documentation
+
+</code></pre>
+
+<p><strong>Figure 5.1 — Project Folder Structure</strong></p>
+
+<h2>5.2 Frontend Architecture</h2>
+
+<p>The frontend is a React 18 single-page application built with Vite.</p>
+
+<p><strong>Entry point:</strong> <code>main.jsx</code> wraps the entire application in <code>&lt;BrowserRouter&gt;</code> (React Router v6) then <code>&lt;AuthProvider&gt;</code> (authentication context), then <code>&lt;App&gt;</code>.</p>
+
+<p><strong><code>App.jsx</code></strong> detects whether the current route starts with <code>/admin</code> and conditionally omits the public Navbar and Footer — admin pages use their own full-page layout.</p>
+
+<p><strong><code>AuthContext.jsx</code></strong> is the central state management layer for authentication:</p>
+<ul><li>On mount, calls <code>GET /api/auth/me</code> to restore session from the HttpOnly cookie</li><li>Exposes <code>user</code>, <code>loading</code>, <code>register()</code>, <code>login()</code>, <code>updateProfile()</code>, <code>logout()</code></li><li>Normalizes the backend field <code>full_name</code> to <code>name</code> via <code>normaliseUser()</code></li><li>All functions make real API calls to the backend via <code>api.js</code></li></ul>
+
+<p><strong><code>api.js</code></strong> is the centralized fetch wrapper:</p>
+<ul><li>All requests include <code>credentials: 'include'</code></li><li>Throws normalized <code>Error</code> objects with <code>err.status</code> and <code>err.fields</code> for form error surfacing</li><li>Exports two groups: <code>authApi</code> (5 endpoints) and <code>adminApi</code> (10 endpoints)</li></ul>
+
+<p><strong>Figure 3.4 — Frontend Component Tree (key components)</strong></p>
+<pre><code>
+App
+
+├── Navbar (public layout)
+
+├── AppRoutes
+
+│   ├── Public routes → [HomePage, CoursesPage, CourseDetailPage, ...]
+
+│   ├── ProtectedRoute → ProfilePage
+
+│   └── AdminRoute → [AdminOverviewPage, AdminUsersPage, ...]
+
+│       └── DashboardLayout
+
+│           ├── DashboardSidebar
+
+│           ├── DashboardHeader
+
+│           └── page content
+
+└── Footer (public layout)
+
+</code></pre>
+
+<h2>5.3 Backend Structure</h2>
+
+<p>The backend follows a layered architecture:</p>
+
+<pre><code>
+Request → CORS + cookieParser + express.json
+
+       → authenticate.js (reads sid cookie, validates session, attaches req.user)
+
+       → requireRole.js (checks req.user.role against allowed roles)
+
+       → Route Handler
+
+       → Model function (parameterized SQL via pg Pool)
+
+       → Response
+
+       → errorHandler.js (catches any thrown errors)
+
+</code></pre>
+
+<p><strong>Models</strong> provide the only database access layer. Each model file corresponds to a database table and exports pure async functions that accept plain objects and return plain objects. The <code>SAFE_COLS</code> constant in <code>userModel.js</code> ensures <code>password_hash</code> is never included in standard queries.</p>
+
+<h2>5.4 REST API Endpoints</h2>
+
+<p><strong>Table 3.2 — API Endpoint Reference</strong></p>
+
+<table><thead><tr><th>Method</th><th>Endpoint</th><th>Auth Required</th><th>Admin Only</th><th>Description</th></tr></thead><tbody><tr><td>GET</td><td>`/api/health`</td><td>No</td><td>No</td><td>Server + DB health check</td></tr><tr><td>POST</td><td>`/api/auth/register`</td><td>No</td><td>No</td><td>Create new account</td></tr><tr><td>POST</td><td>`/api/auth/login`</td><td>No</td><td>No</td><td>Authenticate and set session cookie</td></tr><tr><td>POST</td><td>`/api/auth/logout`</td><td>No</td><td>No</td><td>Delete session and clear cookie</td></tr><tr><td>GET</td><td>`/api/auth/me`</td><td>Yes</td><td>No</td><td>Get authenticated user profile</td></tr><tr><td>PUT</td><td>`/api/auth/me`</td><td>Yes</td><td>No</td><td>Update name and family role</td></tr><tr><td>POST</td><td>`/api/auth/change-password`</td><td>Yes</td><td>No</td><td>Change password, invalidate other sessions</td></tr><tr><td>GET</td><td>`/api/courses`</td><td>No</td><td>No</td><td>List published courses</td></tr><tr><td>GET</td><td>`/api/courses/:id`</td><td>No</td><td>No</td><td>Get course detail with lessons</td></tr><tr><td>POST</td><td>`/api/courses`</td><td>Yes</td><td>Yes</td><td>Create course</td></tr><tr><td>PUT</td><td>`/api/courses/:id`</td><td>Yes</td><td>Yes</td><td>Update course</td></tr><tr><td>DELETE</td><td>`/api/courses/:id`</td><td>Yes</td><td>Yes</td><td>Delete course</td></tr><tr><td>POST</td><td>`/api/enrollments`</td><td>Yes</td><td>No</td><td>Enroll in a course</td></tr><tr><td>GET</td><td>`/api/enrollments/my`</td><td>Yes</td><td>No</td><td>Get user's enrollments</td></tr><tr><td>POST</td><td>`/api/enrollments/:id/progress`</td><td>Yes</td><td>No</td><td>Update lesson progress</td></tr><tr><td>GET</td><td>`/api/professionals`</td><td>No</td><td>No</td><td>List approved professionals</td></tr><tr><td>GET</td><td>`/api/professionals/:id`</td><td>No</td><td>No</td><td>Get professional profile</td></tr><tr><td>POST</td><td>`/api/professionals/apply`</td><td>Yes</td><td>No</td><td>Submit professional application</td></tr><tr><td>GET</td><td>`/api/admin/users`</td><td>Yes</td><td>Yes</td><td>Paginated user list with filters</td></tr><tr><td>GET</td><td>`/api/admin/users/:id`</td><td>Yes</td><td>Yes</td><td>Single user detail</td></tr><tr><td>PATCH</td><td>`/api/admin/users/:id/status`</td><td>Yes</td><td>Yes</td><td>Activate/deactivate account</td></tr><tr><td>PATCH</td><td>`/api/admin/users/:id/role`</td><td>Yes</td><td>Yes</td><td>Change user role</td></tr><tr><td>GET</td><td>`/api/admin/professionals/pending`</td><td>Yes</td><td>Yes</td><td>Pending applications</td></tr><tr><td>PATCH</td><td>`/api/admin/professionals/:id/approve`</td><td>Yes</td><td>Yes</td><td>Approve application</td></tr><tr><td>PATCH</td><td>`/api/admin/professionals/:id/reject`</td><td>Yes</td><td>Yes</td><td>Reject with optional reason</td></tr><tr><td>GET</td><td>`/api/admin/dashboard/stats`</td><td>Yes</td><td>Yes</td><td>Platform statistics</td></tr><tr><td>GET</td><td>`/api/admin/dashboard/recent-users`</td><td>Yes</td><td>Yes</td><td>Recent registrations</td></tr><tr><td>GET</td><td>`/api/admin/dashboard/recent-activity`</td><td>Yes</td><td>Yes</td><td>Combined activity feed</td></tr></tbody></table>
+
+<p><em>Note: Some course, enrollment, and professional endpoints listed above are implemented — refer to the actual routes files for confirmed implementation status.</em></p>
+
+<h2>5.5 Authentication Implementation</h2>
+
+<p>The authentication system uses two utilities:</p>
+
+<p><strong><code>utils/password.js</code></strong> — bcrypt wrapper:</p>
+<pre><code>
+import bcrypt from 'bcryptjs'
+
+const SALT_ROUNDS = 12
+
+
+
+export async function hashPassword(plaintext) {
+
+  return bcrypt.hash(plaintext, SALT_ROUNDS)
+
+}
+
+
+
+export async function verifyPassword(plaintext, hash) {
+
+  return bcrypt.compare(plaintext, hash)
+
+}
+
+
+
+// Dummy hash prevents timing attacks during login for non-existent users
+
+export const DUMMY_HASH = '$2a$12$dummyhashfortimingprotectionXXXXXXXXXXXXXXXXXXX'
+
+</code></pre>
+
+<p><strong><code>utils/session.js</code></strong> — session management:</p>
+<pre><code>
+import { randomBytes } from 'crypto'
+
+
+
+export async function createSession(userId, { ip, userAgent } = {}) {
+
+  const id = randomBytes(32).toString('hex')  // 256-bit entropy
+
+  const expiresAt = new Date(Date.now() + DURATION_MS)
+
+  await pool.query(
+
+    `INSERT INTO sessions (id, user_id, expires_at, ip_address, user_agent)
+
+     VALUES ($1, $2, $3, $4, $5)`,
+
+    [id, userId, expiresAt, ip, userAgent]
+
+  )
+
+  return id
+
+}
+
+</code></pre>
+
+<h2>5.6 Admin Dashboard Statistics</h2>
+
+<p>The <code>getDashboardStats()</code> function in <code>userModel.js</code> runs four parallel database queries to gather live statistics:</p>
+
+<pre><code>
+-- User counts in a single pass
+
+SELECT
+
+  COUNT(*)                                      AS total_users,
+
+  COUNT(*) FILTER (WHERE is_active = TRUE)      AS active_users,
+
+  COUNT(*) FILTER (WHERE role = 'mother')       AS total_mothers,
+
+  -- ... all role counts
+
+FROM users
+
+</code></pre>
+
+<p>This aggregates all counts in a single SQL pass, avoiding multiple round-trips.</p>
+
+<h2>5.7 Role-Based Avatar System</h2>
+
+<p>The <code>RoleAvatar</code> component renders a distinct inline SVG illustration for each family role:</p>
+
+<table><thead><tr><th>Role</th><th>Illustration</th><th>Colour Palette</th></tr></thead><tbody><tr><td>Mother</td><td>Adult figure + child at hip</td><td>Terracotta tones</td></tr><tr><td>Father</td><td>Broader-shouldered figure + collar detail</td><td>Sage green tones</td></tr><tr><td>Legal Guardian</td><td>Figure with shield motif</td><td>Muted purple</td></tr><tr><td>Other Caregiver</td><td>Figure with heart + flanking smaller figures</td><td>Warm amber</td></tr><tr><td>Fallback (null)</td><td>Simple silhouette</td><td>Warm grey</td></tr></tbody></table>
+
+<p>The component accepts a <code>size</code> prop (default 40px) and is used in both the navbar (42px) and the profile page (80px). The role→avatar mapping lives in one file, making updates consistent across the application.</p>
+
+<h2>5.8 Database Connection</h2>
+
+<p>The PostgreSQL connection uses <code>pg</code>'s connection pool for efficient connection reuse:</p>
+
+<pre><code>
+export const pool = new Pool({
+
+  host:     env.DB_HOST,      // default: localhost
+
+  port:     Number(env.DB_PORT),  // default: 5432
+
+  database: env.DB_NAME,
+
+  user:     env.DB_USER,
+
+  password: env.DB_PASSWORD || undefined,
+
+  max: 10,                    // max simultaneous connections
+
+  idleTimeoutMillis: 30000,
+
+  connectionTimeoutMillis: 5000,
+
+})
+
+</code></pre>
+
+<p>The server tests the connection on startup via <code>testConnection()</code> and logs a status banner. Pool errors are forwarded to <code>console.error</code> to prevent silent failure.</p>
+
+<hr>
+
+<h1>CHAPTER 6: TESTING AND DEBUGGING</h1>
+
+<h2>6.1 Testing Methodology</h2>
+
+<p>The project uses integration testing against a live Express server instance. Tests are written as plain Node.js ESM scripts using the <code>node-fetch</code> library to make HTTP requests. No additional test framework (Jest, Mocha) is required. This approach keeps the testing infrastructure lightweight while allowing full end-to-end verification of the API behavior.</p>
+
+<p>Tests are run with: <code>npm run test:all</code> (from <code>server/</code>), which executes four test suites in sequence.</p>
+
+<h2>6.2 Authentication Test Suite (`auth.test.js`)</h2>
+
+<p>32 test assertions covering:</p>
+
+<p><strong>Table 6.1 — Authentication Test Cases</strong></p>
+
+<table><thead><tr><th>ID</th><th>Test Case</th><th>Expected Result</th></tr></thead><tbody><tr><td>R-01</td><td>Valid registration with name, email, password, role</td><td>201; user returned; no password_hash; cookie set</td></tr><tr><td>R-02</td><td>Duplicate email registration</td><td>409 Conflict</td></tr><tr><td>R-03</td><td>Registration with empty name</td><td>400 Bad Request with field error</td></tr><tr><td>R-04</td><td>Registration with weak password (< 8 chars)</td><td>400 Bad Request</td></tr><tr><td>R-05</td><td>Registration with `role: "admin"` in body</td><td>201; role silently defaulted (not admin)</td></tr><tr><td>L-01</td><td>Login with correct credentials</td><td>200; user object; sid cookie set</td></tr><tr><td>L-02</td><td>Login with wrong password</td><td>401; generic error message</td></tr><tr><td>L-03</td><td>Login with unregistered email</td><td>401; same timing as L-02 (timing attack prevention)</td></tr><tr><td>M-01</td><td>GET /me with valid session</td><td>200; correct profile; no password_hash</td></tr><tr><td>M-02</td><td>GET /me with no cookie</td><td>401</td></tr><tr><td>M-03</td><td>GET /me with fake session ID</td><td>401</td></tr><tr><td>U-01</td><td>PUT /me — update full name</td><td>200; name updated</td></tr><tr><td>U-03</td><td>PUT /me with `role: "admin"`</td><td>200; role NOT changed</td></tr><tr><td>U-04</td><td>PUT /me without cookie</td><td>401</td></tr><tr><td>Log-01</td><td>POST /logout</td><td>200; cookie cleared</td></tr><tr><td>Log-02</td><td>GET /me after logout</td><td>401 (session invalidated)</td></tr></tbody></table>
+
+<p><strong>Result: 32/32 PASSED</strong> (verified by running <code>npm run test</code>)</p>
+
+<h2>6.3 Profile Management Test Suite (`profile.test.js`)</h2>
+
+<p>38 test assertions covering profile retrieval, name/role updates, role escalation prevention, and the change-password flow including:</p>
+
+<p><strong>Table 6.2 — Profile Management Test Cases (selected)</strong></p>
+
+<table><thead><tr><th>ID</th><th>Test Case</th><th>Expected Result</th></tr></thead><tbody><tr><td>PR-01</td><td>GET /me returns all required fields</td><td>200; email, full_name, role, is_active, created_at present</td></tr><tr><td>PR-02</td><td>Response never exposes password_hash</td><td>Confirmed absent in all profile responses</td></tr><tr><td>PU-03</td><td>PUT /me with name shorter than 2 chars</td><td>400</td></tr><tr><td>RE-01</td><td>PUT /me with `role: "admin"`</td><td>200; role unchanged</td></tr><tr><td>CP-02</td><td>Change password with wrong current password</td><td>401</td></tr><tr><td>CP-04</td><td>Change password with same new password</td><td>400</td></tr><tr><td>CP-08</td><td>Second session invalidated after password change</td><td>401 (session deleted server-side)</td></tr><tr><td>CP-10</td><td>Old password rejected after change</td><td>401</td></tr><tr><td>CP-11</td><td>New password accepted for login</td><td>200</td></tr></tbody></table>
+
+<p><strong>Result: 38/38 PASSED</strong></p>
+
+<h2>6.4 Admin API Test Suite (`admin.test.js`)</h2>
+
+<p>87 test assertions covering:</p>
+
+<p><strong>Table 6.3 — Admin API Test Cases (selected)</strong></p>
+
+<table><thead><tr><th>ID</th><th>Test Case</th><th>Expected Result</th></tr></thead><tbody><tr><td>UL-01</td><td>GET /admin/users (authenticated admin)</td><td>200; paginated list; no password_hash</td></tr><tr><td>UL-07</td><td>GET /admin/users with invalid role filter</td><td>400</td></tr><tr><td>UL-09</td><td>GET /admin/users as non-admin</td><td>403</td></tr><tr><td>UL-10</td><td>GET /admin/users without auth</td><td>401</td></tr><tr><td>US-02</td><td>Deactivated user attempts login</td><td>403</td></tr><tr><td>US-05</td><td>Admin attempts to deactivate own account</td><td>403 (self-deactivation blocked)</td></tr><tr><td>RM-04</td><td>Admin attempts to change own role</td><td>403 (self-role-change blocked)</td></tr><tr><td>RM-05</td><td>Demoting the last active admin</td><td>Blocked if only 1 admin remains</td></tr><tr><td>PA-03</td><td>Approving an already-approved profile</td><td>200 (idempotent)</td></tr><tr><td>PA-04</td><td>Rejecting with a reason</td><td>200; rejection_reason stored</td></tr><tr><td>DB-01</td><td>GET /admin/dashboard/stats</td><td>200; all count fields present and numeric</td></tr><tr><td>DB-02</td><td>active + inactive = total</td><td>Verified mathematically</td></tr></tbody></table>
+
+<p><strong>Result: 87/87 PASSED</strong></p>
+
+<h2>6.5 Bugs Encountered and Resolved</h2>
+
+<table><thead><tr><th>Bug</th><th>Root Cause</th><th>Resolution</th></tr></thead><tbody><tr><td>`deactivateUser()` runtime crash</td><td>Missing `[id]` parameter array in SQL query call</td><td>Added the parameter array: `pool.query(SQL, [id])`</td></tr><tr><td>Double-fetch on filter change in AdminUsersPage</td><td>Two `useEffect` hooks both triggered on filter state change</td><td>Merged logic so `fetchUsers()` is called once with the correct page</td></tr><tr><td>`user.familyRole` undefined in DashboardHeader</td><td>Backend returns `role`, not `familyRole`; unmapped field</td><td>Changed all references to `user.role`</td></tr><tr><td>Password validation mismatch</td><td>Frontend checked only `length >= 8`; backend also required letter + number</td><td>Added `/[A-Za-z]/` and `/[0-9]/` checks to frontend validation</td></tr><tr><td>`getRoleLabel()` showing raw "admin" string</td><td>`FAMILY_ROLES` array only covered caregiver roles</td><td>Added fallback map `{ professional, admin }` to `getRoleLabel()`</td></tr><tr><td>`bcrypt` native binding failure on Node 26</td><td>`bcrypt@5` requires C++ native build not available on Node 26</td><td>Replaced with `bcryptjs@2` (pure JavaScript, identical API)</td></tr></tbody></table>
+
+<hr>
+
+<h1>CHAPTER 7: DEPLOYMENT</h1>
+
+<h2>7.1 Current Deployment Status</h2>
+
+<p><strong>The application has not been deployed to production at the time of this documentation.</strong> Both the frontend and backend run locally on a developer's machine. This chapter describes the configuration required for production deployment and documents the local development setup.</p>
+
+<h2>7.2 Local Development Configuration</h2>
+
+<p><strong>Frontend (from <code>client/</code>):</strong></p>
+<pre><code>
+npm install          # Install dependencies (first time only)
+
+npm run dev          # Start Vite dev server on http://localhost:5173
+
+npm run build        # Create production build in client/dist/
+
+</code></pre>
+
+<p><strong>Backend (from <code>server/</code>):</strong></p>
+<pre><code>
+npm install          # Install dependencies (first time only)
+
+cp .env.example .env # Create local environment file
+
+npm run migrate      # Apply database schema to sidra_db
+
+npm run dev          # Start Express server on http://localhost:5000
+
+</code></pre>
+
+<h2>7.3 Environment Variables</h2>
+
+<p><strong>Table 7.1 — Environment Variables (<code>server/.env</code>)</strong></p>
+
+<table><thead><tr><th>Variable</th><th>Default</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>`PORT`</td><td>5000</td><td>No</td><td>Express server port</td></tr><tr><td>`NODE_ENV`</td><td>development</td><td>No</td><td>Environment mode</td></tr><tr><td>`CLIENT_ORIGIN`</td><td>http://localhost:5173</td><td>No</td><td>Allowed CORS origin</td></tr><tr><td>`DB_HOST`</td><td>localhost</td><td>No</td><td>PostgreSQL host</td></tr><tr><td>`DB_PORT`</td><td>5432</td><td>No</td><td>PostgreSQL port</td></tr><tr><td>`DB_NAME`</td><td>—</td><td>**Yes**</td><td>Database name (e.g., sidra_db)</td></tr><tr><td>`DB_USER`</td><td>—</td><td>**Yes**</td><td>PostgreSQL username</td></tr><tr><td>`DB_PASSWORD`</td><td>—</td><td>No</td><td>PostgreSQL password (empty = no password)</td></tr><tr><td>`SESSION_SECRET`</td><td>—</td><td>**Yes**</td><td>Secret for session management</td></tr><tr><td>`SESSION_DURATION_DAYS`</td><td>7</td><td>No</td><td>Session lifetime in days</td></tr></tbody></table>
+
+<blockquote>t; **Security note:** The `.env` file is listed in `.gitignore` and must never be committed to version control. The `.env.example` file contains placeholder values only and is safe to commit.</blockquote>
+
+<h2>7.4 Production Deployment Plan (Planned)</h2>
+
+<p>For production deployment, the following configuration changes are required:</p>
+
+<table><thead><tr><th>Setting</th><th>Development</th><th>Production</th></tr></thead><tbody><tr><td>`NODE_ENV`</td><td>`development`</td><td>`production`</td></tr><tr><td>Cookie `Secure` flag</td><td>Off</td><td>On (requires HTTPS)</td></tr><tr><td>Cookie `SameSite`</td><td>`Lax`</td><td>`Lax` (confirm if same-site or cross-subdomain)</td></tr><tr><td>CORS origin</td><td>`http://localhost:5173`</td><td>Production frontend URL</td></tr><tr><td>Database</td><td>Local PostgreSQL</td><td>Hosted PostgreSQL (e.g., Supabase, Neon, Render)</td></tr><tr><td>Backend hosting</td><td>Local Node.js</td><td>Render, Railway, or VPS</td></tr><tr><td>Frontend hosting</td><td>Vite dev server</td><td>Vercel, Netlify, or static host</td></tr></tbody></table>
+
+<p>The production build command (<code>npm run build</code>) has been verified to complete without errors, producing a <code>client/dist/</code> directory ready for static hosting.</p>
+
+<hr>
+
+<h1>CHAPTER 8: TEAM COLLABORATION</h1>
+
+<h2>8.1 Team Structure</h2>
+
+<p>The project was developed by two team members with divided responsibilities:</p>
+
+<p><strong>Beimenet (Developer 1):</strong></p>
+<ul><li>Homepage and Courses frontend (pages, components, filtering, search)</li><li>Authentication system (frontend and backend)</li><li>User profile management (frontend and backend)</li><li>Admin Dashboard (all 8 admin pages, admin API routes)</li><li>Database schema design and migration infrastructure</li><li>Backend foundation (Express setup, CORS, middleware, error handling)</li><li>PostgreSQL connection and model layer</li><li>Project documentation</li></ul>
+
+<p><strong>Amanuel (Developer 2):</strong></p>
+<ul><li>Professionals page and Professional Profile page</li><li>About Us page</li><li>Resources page</li><li>Course, lesson, and enrollment backend modules</li><li>Professional directory API</li><li>Community/Circles features</li></ul>
+
+<h2>8.2 Git Workflow</h2>
+
+<p>The project uses a single <code>main</code> branch with direct commits. Key milestones visible in the commit history include:</p>
+
+<ul><li>Initial repository setup and README</li><li>Frontend foundation (Vite + Tailwind + React Router)</li><li>Homepage implementation</li><li>Courses page and course detail implementation</li><li>Backend scaffold (Express + CORS + health check)</li><li>Database schema and PostgreSQL connection</li><li>Authentication system (bcrypt + session cookies)</li><li>Admin dashboard and APIs</li><li>Bug fixes and integration work</li><li>Documentation</li></ul>
+
+<h2>8.3 Collaboration Practices</h2>
+
+<ul><li>Changes affecting shared infrastructure (database schema, middleware, API shape) were coordinated before implementation</li><li>A clear module boundary was maintained: Beimenet owned auth/user/admin routes; Amanuel owned course/professional/enrollment routes</li><li>The <code>main</code> branch was kept working at all times; breaking changes were identified and fixed promptly</li><li>One merge conflict was encountered in <code>README.md</code> (documented in Git history) and resolved by combining both versions</li></ul>
+
+<hr>
+
+<h1>CHAPTER 9: CHALLENGES AND SOLUTIONS</h1>
+
+<h2>9.1 PostgreSQL Password Authentication</h2>
+
+<p><strong>Challenge:</strong> The PostgreSQL installation had authentication configured as <code>scram-sha-256</code>, but the initial password was not set. Connecting the Node.js <code>pg</code> pool returned "password authentication failed" even with an empty password field.</p>
+
+<p><strong>Solution:</strong> The <code>ALTER USER postgres WITH PASSWORD '...'</code> command was executed via pgAdmin's Query Tool to set an explicit password. The <code>pg</code> Pool was also updated to use <code>...(password ? { password } : {})</code> spread to omit the key entirely when no password is configured, matching PostgreSQL's trust behavior.</p>
+
+<h2>9.2 bcrypt Native Build Failure</h2>
+
+<p><strong>Challenge:</strong> The <code>bcrypt</code> npm package (v5) requires native C++ bindings compiled at install time using <code>node-pre-gyp</code>. On Node.js v26, the pre-built binary was unavailable and compilation failed.</p>
+
+<p><strong>Solution:</strong> Replaced <code>bcrypt</code> with <code>bcryptjs</code>, a pure JavaScript implementation with an identical API. No code changes were required beyond changing the import; performance is slightly slower but perfectly acceptable for authentication workloads.</p>
+
+<h2>9.3 Session Persistence After Page Refresh</h2>
+
+<p><strong>Challenge:</strong> The original frontend simulation used <code>sessionStorage</code>, which is cleared when a browser tab is closed. Integrating real backend sessions required changing the restoration mechanism entirely.</p>
+
+<p><strong>Solution:</strong> On application mount, <code>AuthContext</code> calls <code>GET /api/auth/me</code>. The server reads the HttpOnly cookie, validates the session against the <code>sessions</code> table, and returns the user profile. If the cookie is absent or the session is expired, the server returns 401 and the frontend sets <code>user = null</code>. No client-side storage is involved.</p>
+
+<h2>9.4 Git Merge Conflict in README.md</h2>
+
+<p><strong>Challenge:</strong> Both developers made changes to <code>README.md</code> simultaneously in separate commits. The file contained conflict markers (<code>&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>) that prevented it from rendering correctly.</p>
+
+<p><strong>Solution:</strong> The conflict was resolved by reading both versions of the conflicting section, combining their content, and writing a clean unified version. All conflict markers were removed and the file was committed.</p>
+
+<h2>9.5 Frontend–Backend Field Name Mismatch</h2>
+
+<p><strong>Challenge:</strong> The backend returns user objects with the field <code>full_name</code>, but the frontend components referenced <code>user.name</code>. This caused silent <code>undefined</code> rendering on profile pages and the navbar.</p>
+
+<p><strong>Solution:</strong> A <code>normaliseUser()</code> function was added to <code>AuthContext.jsx</code> that maps <code>full_name → name</code> on every user object received from the API:</p>
+<pre><code>
+function normaliseUser(backendUser) {
+
+  if (!backendUser) return null
+
+  return { ...backendUser, name: backendUser.full_name }
+
+}
+
+</code></pre>
+
+<h2>9.6 Double-Fetch on Filter Change</h2>
+
+<p><strong>Challenge:</strong> The Admin Users page had two <code>useEffect</code> hooks: one listening to filter state to reset the page to 1, and one calling <code>fetchUsers()</code> when the page changed. When a filter changed, both effects fired, causing two API calls: one with the old page number and one with page 1.</p>
+
+<p><strong>Solution:</strong> The <code>fetchUsers</code> function was refactored to accept an optional <code>overridePage</code> parameter. The filter-change effect now calls <code>fetchUsers(1)</code> directly if the page is already 1, or sets the page to 1 (which triggers a single fetch via the page-dependency effect).</p>
+
+<h2>9.7 `EADDRINUSE` Port Conflict</h2>
+
+<p><strong>Challenge:</strong> When using <code>node --watch</code>, if the process was killed uncleanly, the old process continued holding port 5000. Restarting would fail with <code>Error: listen EADDRINUSE: address already in use :::5000</code>.</p>
+
+<p><strong>Solution:</strong> Running <code>Get-Process -Name "node" | Stop-Process -Force</code> in PowerShell before restarting clears all Node.js processes. This is a known limitation of <code>node --watch</code> and a production process manager (PM2, systemd) would handle this automatically.</p>
+
+<hr>
+
+<h1>CHAPTER 10: CONCLUSION AND FUTURE ENHANCEMENTS</h1>
+
+<h2>10.1 Project Achievements</h2>
+
+<p>Sidra has achieved significant progress across all layers of its intended architecture:</p>
+
+<p><strong>Frontend (Complete):</strong></p>
+<ul><li>Responsive, accessible, bilingual UI across 13+ pages</li><li>Full authentication flow (login, register, profile, logout)</li><li>Complete course browsing with search, filtering, and sorting</li><li>Role-based avatar system with distinct SVG illustrations</li><li>Fully connected admin dashboard with real-time data from PostgreSQL</li><li>Community and chat prototype interface</li></ul>
+
+<p><strong>Backend (Largely Complete):</strong></p>
+<ul><li>Secure authentication system with bcrypt and server-managed sessions</li><li>Complete admin API (user management, professional approvals, statistics)</li><li>Database schema with 7 normalized tables and proper constraints</li><li>Integration test suite with 157 passing assertions</li></ul>
+
+<p><strong>Database:</strong></p>
+<ul><li>7 normalized PostgreSQL tables with foreign keys, indexes, and constraint enforcement</li><li>Idempotent migration system</li></ul>
+
+<h2>10.2 Objectives Accomplished</h2>
+
+<table><thead><tr><th>Objective</th><th>Status</th></tr></thead><tbody><tr><td>Normalized PostgreSQL database</td><td>✅ Complete — 7 tables</td></tr><tr><td>Secure authentication</td><td>✅ Complete — bcrypt + HttpOnly cookies</td></tr><tr><td>Role-based access control</td><td>✅ Complete — frontend guards + backend middleware</td></tr><tr><td>Responsive bilingual UI</td><td>✅ Complete</td></tr><tr><td>Admin dashboard APIs</td><td>✅ Complete</td></tr><tr><td>Admin dashboard frontend</td><td>✅ Complete</td></tr><tr><td>Community feature prototype</td><td>✅ Frontend prototype complete</td></tr><tr><td>Test suite</td><td>✅ 157 assertions passing</td></tr></tbody></table>
+
+<h2>10.3 Current Limitations</h2>
+
+<ul><li><strong>Course enrollment API</strong> — The backend enrollment endpoint exists but the frontend connection is pending. Authenticated users see a "coming soon" notice on course detail pages.</li><li><strong>Payment integration</strong> — The PaymentModal component is present (demo only). Telebirr and Chapa integration requires backend provider APIs and a secure verification flow.</li><li><strong>Real-time chat</strong> — The Circles &amp; Chat page uses mock data. Live chat requires WebSocket infrastructure.</li><li><strong>Email delivery</strong> — Password reset and email verification are designed but not implemented pending selection of an email provider.</li><li><strong>Production deployment</strong> — The application has not been deployed to a live server.</li></ul>
+
+<h2>10.4 Lessons Learned</h2>
+
+<ul><li><strong>Schema-first development</strong> — Designing the database schema before writing API code prevented most data modeling mistakes and made the API shape predictable.</li><li><strong>Security defaults</strong> — Implementing security from the start (bcrypt, HttpOnly cookies, parameterized queries) was significantly easier than retrofitting it later.</li><li><strong>Consistent field naming</strong> — The <code>full_name</code>/<code>name</code> mismatch across the frontend and backend caused unnecessary debugging time. A shared naming convention defined at the start of the project would have prevented this.</li><li><strong>Integration testing</strong> — The plain-Node.js test approach proved highly effective. Tests are fast, self-contained, and catch regressions immediately without complex framework setup.</li></ul>
+
+<h2>10.5 Future Enhancements</h2>
+
+<ul><li><strong>Complete course enrollment API</strong> — Connect the existing backend enrollment model to the frontend and enable lesson progress tracking.</li><li><strong>Payment integration</strong> — Implement Telebirr and Chapa payment providers with backend verification and webhook handling.</li><li><strong>Real-time communication</strong> — Migrate the Circles &amp; Chat feature to a WebSocket implementation using Socket.io or a similar library.</li><li><strong>Email delivery</strong> — Integrate an email provider (Resend, SendGrid) for password reset and email verification.</li><li><strong>Content management</strong> — Build a full course authoring interface in the admin dashboard for creating and editing courses and lessons.</li><li><strong>Multilingual support</strong> — Extend the bilingual Amharic/English branding into full content internationalization.</li><li><strong>Production deployment</strong> — Deploy the frontend to a CDN-backed static host (Vercel, Netlify) and the backend to a managed Node.js host (Render, Railway), with a hosted PostgreSQL instance.</li><li><strong>Mobile application</strong> — Consider a React Native port of the core features for offline-capable mobile access.</li><li><strong>Analytics and reporting</strong> — Expand the admin reports section with time-series charts for user growth, enrollment trends, and content performance.</li><li><strong>Accessibility audit</strong> — Commission a professional WCAG 2.1 Level AA audit with assistive technology testing before public launch.</li></ul>
+
+<h2>10.6 Final Conclusion</h2>
+
+<p>Sidra represents a technically well-founded and socially meaningful piece of software. It demonstrates the effective application of the PERN stack in building a production-quality full-stack web application, with particular attention to security, data integrity, and user experience.</p>
+
+<p>The project proves that a small development team can deliver a complex, multi-role platform with real database connectivity, server-side authentication, and a comprehensive admin system. The architecture is clean, extensible, and well-documented, providing a solid foundation for the remaining features and eventual production deployment.</p>
+
+<p>The mission that inspired Sidra — to empower Ethiopian families with reliable parenting knowledge and professional support — remains the guiding principle for all future development.</p>
+
+<hr>
+
+<h1>REFERENCES</h1>
+
+<ul><li>React Documentation. (2024). <em>React 18 Reference</em>. https://react.dev</li><li>Vite Documentation. (2024). <em>Vite Guide</em>. https://vitejs.dev/guide/</li><li>Tailwind CSS Documentation. (2024). <em>Tailwind CSS v3</em>. https://tailwindcss.com/docs</li><li>React Router Documentation. (2024). <em>React Router v6</em>. https://reactrouter.com</li><li>Express.js Documentation. (2024). <em>Express 4.x API Reference</em>. https://expressjs.com/en/4x/api.html</li><li>node-postgres Documentation. (2024). <em>pg — PostgreSQL client for Node.js</em>. https://node-postgres.com</li><li>PostgreSQL Documentation. (2024). <em>PostgreSQL 16 Documentation</em>. https://www.postgresql.org/docs/</li><li>bcryptjs. (2024). <em>bcryptjs — bcrypt in plain JS</em>. https://github.com/dcodeIO/bcrypt.js</li><li>OWASP. (2024). <em>Authentication Cheat Sheet</em>. https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html</li><li>MDN Web Docs. (2024). <em>HTTP cookies</em>. https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies</li><li>W3C. (2023). <em>Web Content Accessibility Guidelines (WCAG) 2.1</em>. https://www.w3.org/TR/WCAG21/</li></ul>
+
+<hr>
+
+<h1>APPENDIX A — API Endpoint Reference</h1>
+
+<p>See Table 3.2 in Chapter 3 for the full endpoint reference.</p>
+
+<h1>APPENDIX B — Database Schema</h1>
+
+<p>See Chapter 3.4 and Chapter 3.5 for the complete database schema and entity-relationship diagram. The authoritative schema definition is located at:</p>
+
+<p><code>server/src/db/schema.sql</code></p>
+
+<p>Apply with: <code>cd server &amp;&amp; npm run migrate</code></p>
+
+<h1>APPENDIX C — Project Setup Instructions</h1>
+
+<pre><code>
+# Clone the repository
+
+git clone <repository-url>
+
+cd Sidra
+
+
+
+# Backend setup
+
+cd server
+
+npm install
+
+cp .env.example .env
+
+# Edit .env: set DB_NAME, DB_USER, DB_PASSWORD, SESSION_SECRET
+
+npm run migrate        # Apply schema to PostgreSQL
+
+npm run dev            # Start backend on http://localhost:5000
+
+
+
+# Frontend setup (in a new terminal)
+
+cd client
+
+npm install
+
+npm run dev            # Start frontend on http://localhost:5173
+
+</code></pre>
+
+<p><strong>To access the Admin Dashboard:</strong></p>
+<ul><li>Register at <code>/register</code></li><li>Open pgAdmin, run: <code>UPDATE users SET role = 'admin' WHERE email = 'your@email.com';</code></li><li>Log out and log back in</li><li>Navigate to <code>/admin</code></li></ul>
+
+<h1>APPENDIX D — Test Results Summary</h1>
+
+<table><thead><tr><th>Test Suite</th><th>Tests</th><th>Result</th></tr></thead><tbody><tr><td>`auth.test.js`</td><td>32</td><td>✅ All passed</td></tr><tr><td>`profile.test.js`</td><td>38</td><td>✅ All passed</td></tr><tr><td>`admin.test.js`</td><td>87</td><td>✅ All passed</td></tr><tr><td>Frontend build</td><td>—</td><td>✅ 0 errors, 0 warnings</td></tr><tr><td>**Total**</td><td>**157**</td><td>**✅ All passed**</td></tr></tbody></table>
+
+<p><em>Tests run with: <code>cd server &amp;&amp; npm run test:all</code></em></p>
+<p><em>Build verified with: <code>cd client &amp;&amp; npm run build</code></em></p>
+</div>
+</body>
+</html>

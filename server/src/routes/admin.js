@@ -23,8 +23,8 @@
  */
 
 import { Router } from 'express'
-import { authenticate }  from '../middleware/authenticate.js'
-import { requireRole }   from '../middleware/requireRole.js'
+import { authenticate } from '../middleware/authenticate.js'
+import { requireRole } from '../middleware/requireRole.js'
 import { deleteAllUserSessions } from '../utils/session.js'
 import {
   findUserById,
@@ -85,7 +85,7 @@ router.get('/users', async (req, res, next) => {
 
     // Parse is_active
     let activeFilter
-    if (is_active === 'true')  activeFilter = true
+    if (is_active === 'true') activeFilter = true
     if (is_active === 'false') activeFilter = false
 
     // Validate sort
@@ -97,12 +97,12 @@ router.get('/users', async (req, res, next) => {
     }
 
     const result = await adminListUsers({
-      search:    search   ?? '',
-      role:      role     ?? '',
+      search: search ?? '',
+      role: role ?? '',
       is_active: activeFilter,
-      sort:      sort     ?? 'newest',
-      page:      page     ?? 1,
-      limit:     limit    ?? 20,
+      sort: sort ?? 'newest',
+      page: page ?? 1,
+      limit: limit ?? 20,
     })
 
     return res.status(200).json(result)
@@ -172,7 +172,7 @@ router.patch('/users/:id/status', async (req, res, next) => {
     // No-op if already in the requested state
     if (target.is_active === is_active) {
       return res.status(200).json({
-        user:    target,
+        user: target,
         message: `Account is already ${is_active ? 'active' : 'inactive'}.`,
       })
     }
@@ -185,7 +185,7 @@ router.patch('/users/:id/status', async (req, res, next) => {
     }
 
     return res.status(200).json({
-      user:    updated,
+      user: updated,
       message: `Account ${is_active ? 'activated' : 'deactivated'} successfully.`,
     })
   } catch (err) {
@@ -248,7 +248,7 @@ router.patch('/users/:id/role', async (req, res, next) => {
 
     const updated = await adminSetRole(id, role)
     return res.status(200).json({
-      user:    updated,
+      user: updated,
       message: `Role updated to '${role}'.`,
     })
   } catch (err) {
@@ -334,7 +334,7 @@ router.patch('/professionals/:id/reject', async (req, res, next) => {
       })
     }
 
-    const reason  = typeof req.body.reason === 'string' ? req.body.reason.trim() : null
+    const reason = typeof req.body.reason === 'string' ? req.body.reason.trim() : null
     const updated = await rejectProfile(id, req.user.id, reason || null)
 
     return res.status(200).json({
@@ -423,3 +423,85 @@ router.get('/dashboard/recent-activity', async (req, res, next) => {
 })
 
 export default router
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ENROLLMENT MANAGEMENT — admin view
+// ═════════════════════════════════════════════════════════════════════════════
+
+import { pool as _pool } from '../config/db.js'
+
+/**
+ * GET /api/admin/enrollments
+ * List all enrollments with user and course details.
+ *
+ * Query params:
+ *   course_id — filter by course UUID
+ *   user_id   — filter by user UUID
+ *   status    — filter by payment_status
+ *   page      — page number (default 1)
+ *   limit     — results per page (default 20, max 100)
+ */
+router.get('/enrollments', async (req, res, next) => {
+  try {
+    const { course_id, user_id, status, page, limit } = req.query
+
+    const safePage = Math.max(1, parseInt(page, 10) || 1)
+    const safeLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20))
+    const offset = (safePage - 1) * safeLimit
+
+    const VALID_STATUSES = ['free', 'pending', 'completed', 'failed', 'refunded']
+    if (status && !VALID_STATUSES.includes(status)) {
+      return res.status(400).json({
+        error: { message: `Invalid status filter. Must be one of: ${VALID_STATUSES.join(', ')}` },
+      })
+    }
+
+    const UUID_RE2 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (course_id && !UUID_RE2.test(course_id))
+      return res.status(400).json({ error: { message: 'Invalid course_id format.' } })
+    if (user_id && !UUID_RE2.test(user_id))
+      return res.status(400).json({ error: { message: 'Invalid user_id format.' } })
+
+    const conditions = []
+    const params = []
+
+    if (course_id) { params.push(course_id); conditions.push(`e.course_id = $${params.length}`) }
+    if (user_id) { params.push(user_id); conditions.push(`e.user_id = $${params.length}`) }
+    if (status) { params.push(status); conditions.push(`e.payment_status = $${params.length}`) }
+
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
+
+    // Count
+    const countRes = await _pool.query(
+      `SELECT COUNT(*) AS total FROM enrollments e ${where}`, params
+    )
+    const total = Number(countRes.rows[0].total)
+
+    // Data with user + course info
+    params.push(safeLimit, offset)
+    const { rows } = await _pool.query(
+      `SELECT
+         e.id, e.user_id, e.course_id, e.enrolled_at, e.payment_status,
+         u.full_name AS user_name, u.email AS user_email, u.role AS user_role,
+         c.title AS course_title, c.price_etb, c.published AS course_published
+       FROM enrollments e
+       JOIN users u   ON u.id = e.user_id
+       JOIN courses c ON c.id = e.course_id
+       ${where}
+       ORDER BY e.enrolled_at DESC
+       LIMIT $${params.length - 1} OFFSET $${params.length}`,
+      params
+    )
+
+    return res.status(200).json({
+      enrollments: rows,
+      total,
+      page: safePage,
+      limit: safeLimit,
+      pages: Math.ceil(total / safeLimit),
+    })
+  } catch (err) {
+    next(err)
+  }
+})

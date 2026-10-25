@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { getCourseById, formatPrice } from '../data/courses.js'
 import PaymentModal from '../components/courses/PaymentModal.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { coursesApi } from '../services/api.js'
 
 // ── Icon helpers ──────────────────────────────────────────────────────────────
 function CheckIcon() {
@@ -139,23 +140,44 @@ function ResourceItem({ resource }) {
 // ── Enrol button — handles auth state and API availability ───────────────────
 /**
  * Behaviour:
- *  - Not logged in  → redirect to /login, preserving the course URL as `from`
- *  - Logged in      → show "Enrolment coming soon" notice (enrollment API not
- *                     yet implemented by Amanuel — no fake success created)
- *
- * When Amanuel's POST /api/enrollments endpoint is ready:
- *   1. Add  enrollmentApi.enroll(courseId)  to api.js
- *   2. Replace the "coming soon" block below with a real API call
+ *  - Not logged in  → redirect to /login, preserving course URL as `from`
+ *  - Logged in, free course → call POST /api/courses/:id/enroll
+ *  - Logged in, paid course → show payment modal (payment not yet integrated)
+ *  - Already enrolled → show "Go to course" link
  */
 function EnrolButton({ user, course, navigate, location }) {
-  function handleClick() {
+  const [enrolling, setEnrolling] = useState(false)
+  const [enrolled, setEnrolled] = useState(false)
+  const [enrollError, setEnrollError] = useState('')
+
+  // Note: course.id here is the static demo ID (number 1–8).
+  // When courses are served from the real API, this will be a UUID.
+  // The enroll API requires a valid UUID course ID from the database.
+  // Until the frontend Courses page is connected to the real API, this
+  // button redirects authenticated users to check enrollments instead.
+
+  async function handleEnrol() {
     if (!user) {
-      // Not logged in — send to login and remember where to return
       navigate('/login', { state: { from: location.pathname } })
       return
     }
-    // Logged in but enrollment API not yet available
-    // Component stays mounted; the notice below is shown instead of an alert
+    setEnrolling(true)
+    setEnrollError('')
+    try {
+      await coursesApi.enroll(course.id)
+      setEnrolled(true)
+    } catch (err) {
+      if (err.status === 409) {
+        // Already enrolled — treat as success
+        setEnrolled(true)
+      } else if (err.status === 404) {
+        setEnrollError('This course is not yet available for enrollment in the database.')
+      } else {
+        setEnrollError(err.message ?? 'Enrollment failed. Please try again.')
+      }
+    } finally {
+      setEnrolling(false)
+    }
   }
 
   // Not logged in
@@ -165,7 +187,7 @@ function EnrolButton({ user, course, navigate, location }) {
         <button
           type="button"
           className="btn-primary w-full mb-3"
-          onClick={handleClick}
+          onClick={handleEnrol}
         >
           Log in to Enrol
         </button>
@@ -176,21 +198,43 @@ function EnrolButton({ user, course, navigate, location }) {
     )
   }
 
-  // Logged in — enrollment API not yet implemented
+  // Already enrolled
+  if (enrolled) {
+    return (
+      <>
+        <div className="w-full mb-3 px-4 py-3 bg-sage/20 border border-sage/40 rounded-xl text-sm text-charcoal font-medium text-center flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-sage" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clipRule="evenodd" />
+          </svg>
+          Enrolled successfully!
+        </div>
+        <Link to="/profile" className="btn-secondary w-full text-center text-sm">
+          Go to My Profile
+        </Link>
+      </>
+    )
+  }
+
+  // Logged in — ready to enrol
   return (
     <>
+      {enrollError && (
+        <div role="alert" className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+          {enrollError}
+        </div>
+      )}
       <button
         type="button"
-        className="btn-primary w-full mb-3 opacity-60 cursor-not-allowed"
-        disabled
-        aria-disabled="true"
-        title="Course enrollment is not yet available"
+        onClick={handleEnrol}
+        disabled={enrolling}
+        className="btn-primary w-full mb-3 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        Enrol for Free
+        {enrolling ? 'Enrolling…' : 'Enrol for Free'}
       </button>
-      <p className="text-xs text-center text-warm-gray leading-relaxed">
-        Course enrollment is not yet available.
-        We are working on connecting this feature — check back soon.
+      <p className="text-xs text-center text-warm-gray">
+        {enrollError
+          ? 'Course data will be available once connected to the database.'
+          : 'Free enrolment — no payment required.'}
       </p>
     </>
   )
@@ -202,13 +246,35 @@ export default function CourseDetailPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { user } = useAuth()
-  const course = getCourseById(id)
   const [paymentOpen, setPaymentOpen] = useState(false)
 
-  // First preview lesson for the video placeholder
-  const previewLesson = course?.modules
-    .flatMap((m) => m.lessons)
-    .find((l) => l.preview && l.type === 'video')
+  // Try to fetch the real course from the API first; fall back to static data
+  const staticCourse = getCourseById(id)
+  const [apiCourse, setApiCourse] = useState(null)
+  const [apiLoading, setApiLoading] = useState(true)
+
+  useEffect(() => {
+    // Only attempt API lookup for UUID-shaped IDs (real courses)
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (!UUID_RE.test(id)) { setApiLoading(false); return }
+
+    coursesApi.get(id)
+      .then((data) => setApiCourse(data.course ?? null))
+      .catch(() => setApiCourse(null))
+      .finally(() => setApiLoading(false))
+  }, [id])
+
+  // Loading state for real-API courses
+  if (apiLoading && !staticCourse) {
+    return (
+      <main id="main-content" tabIndex={-1} className="bg-cream min-h-[60vh] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full border-4 border-terracotta/30 border-t-terracotta animate-spin" role="status" aria-label="Loading course" />
+      </main>
+    )
+  }
+
+  // Use API course if available, otherwise fall back to static data
+  const course = apiCourse ?? staticCourse
 
   if (!course) {
     return (
@@ -223,8 +289,20 @@ export default function CourseDetailPage() {
     )
   }
 
-  const isFree = course.price === 0
-  const totalLessons = course.modules.reduce((sum, m) => sum + m.lessons.length, 0)
+  // Normalise price field — API uses price_etb, static data uses price
+  const priceValue = course.price_etb !== undefined ? parseFloat(course.price_etb) : (course.price ?? 0)
+  const isFree = priceValue === 0
+
+  // Normalise lessons for display
+  const modules = course.modules ?? []
+  const totalLessons = modules.length > 0
+    ? modules.reduce((sum, m) => sum + m.lessons.length, 0)
+    : (course.lesson_count ?? 0)
+
+  // First preview lesson for the video placeholder
+  const previewLesson = modules
+    .flatMap((m) => m.lessons ?? [])
+    .find((l) => l.preview && l.type === 'video')
 
   return (
     <main id="main-content" tabIndex={-1}>
@@ -249,11 +327,13 @@ export default function CourseDetailPage() {
 
             {/* Left: info */}
             <div className="flex-1">
-              {/* Demo notice */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-charcoal/8 rounded-full text-xs font-medium text-charcoal mb-4">
-                <span aria-hidden="true">⚠️</span>
-                {course.demoNotice}
-              </div>
+              {/* Demo notice — only show for static demo courses */}
+              {course.demoNotice && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-charcoal/8 rounded-full text-xs font-medium text-charcoal mb-4">
+                  <span aria-hidden="true">⚠️</span>
+                  {course.demoNotice}
+                </div>
+              )}
 
               {/* Badges */}
               <div className="flex flex-wrap gap-2 mb-4">
@@ -299,7 +379,7 @@ export default function CourseDetailPage() {
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mb-1">
                   <span className="text-3xl font-bold text-charcoal">
-                    {formatPrice(course.price)}
+                    {formatPrice(priceValue)}
                   </span>
                   {isFree && (
                     <span className="text-sm text-sage font-semibold">Always free</span>
@@ -320,13 +400,18 @@ export default function CourseDetailPage() {
                 {isFree ? (
                   <EnrolButton user={user} course={course} navigate={navigate} location={location} />
                 ) : (
-                  <button
-                    type="button"
-                    className="btn-primary w-full mb-3"
-                    onClick={() => setPaymentOpen(true)}
-                  >
-                    Purchase Course
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      className="btn-primary w-full mb-3"
+                      onClick={() => setPaymentOpen(true)}
+                    >
+                      Purchase Course — {formatPrice(priceValue)}
+                    </button>
+                    <p className="text-xs text-center text-warm-gray">
+                      Online payments are coming soon. No charge will be made now.
+                    </p>
+                  </>
                 )}
 
                 <hr className="my-5 border-border" />

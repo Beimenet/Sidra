@@ -8,7 +8,10 @@
  *   ✅  PostgreSQL connection pool — connected to sidra_db
  *   ✅  Database schema applied (7 tables including sessions)
  *   ✅  Authentication — server-managed sessions with HttpOnly cookies
- *   🔲  Course / professional / enrollment endpoints — stubs only (501)
+ *   ✅  Course, lesson, enrollment, and progress APIs — fully implemented
+ *   ✅  Professional directory — fully implemented
+ *   ✅  Admin user management, professional approvals, dashboard stats
+ *   🔲  Payment provider integration (Chapa / Telebirr) — pending
  */
 
 import express from 'express'
