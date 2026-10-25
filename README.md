@@ -631,7 +631,8 @@ Both developers collaborate on:
 | Database | PostgreSQL |
 | Authentication | Database-backed sessions, HttpOnly cookies, bcrypt |
 | Version Control | Git, GitHub |
-| Development Tools | VS Code, Kiro |
+| Development Tools | VS Code |
+| Cloudinary for uploaded media |
 
 ### 📋 Task Distribution Summary
 
