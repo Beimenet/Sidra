@@ -20,7 +20,7 @@ import { testConnection } from './config/db.js'
 // Route handlers
 import healthRouter from './routes/health.js'
 import authRouter from './routes/auth.js'
-import coursesRouter from './routes/courses.js'
+import coursesRouter, { enrollmentsRouter } from './routes/courses.js'
 import professionalsRouter from './routes/professionals.js'
 import adminRouter from './routes/admin.js'
 
@@ -56,13 +56,14 @@ app.get('/', (_req, res) => {
       courses: 'GET /api/courses',
       professionals: 'GET /api/professionals',
     },
-    note: 'Course, enrollment, and professional directory endpoints are under development.',
+    note: 'Full course, enrollment, lesson, progress, and professional directory APIs are now implemented.',
   })
 })
 
 app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/courses', coursesRouter)
+app.use('/api/enrollments', enrollmentsRouter)
 app.use('/api/professionals', professionalsRouter)
 app.use('/api/admin', adminRouter)
 

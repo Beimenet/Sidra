@@ -54,6 +54,21 @@ export async function listEnrollmentsByUser(user_id) {
 }
 
 /**
+ * Find a single enrollment by its own UUID.
+ * Returns null if not found.
+ */
+export async function findEnrollmentById(id) {
+  const { rows } = await pool.query(
+    `SELECT e.*, c.title, c.category, c.thumbnail_url, c.price_etb, c.published
+     FROM   enrollments e
+     JOIN   courses c ON c.id = e.course_id
+     WHERE  e.id = $1`,
+    [id]
+  )
+  return rows[0] ?? null
+}
+
+/**
  * Update the payment status of an enrollment — backend/admin only.
  */
 export async function updatePaymentStatus(id, payment_status) {
