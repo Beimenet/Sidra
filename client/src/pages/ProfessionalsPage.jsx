@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PROFESSIONALS, SPECIALTIES, LANGUAGES, FORMATS } from '../data/professionals.js'
+import VerifiedBadge from '../components/common/VerifiedBadge.jsx'
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -44,9 +45,8 @@ function FilterChip({ label, active, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`text-sm font-medium px-4 py-1.5 rounded-full border transition-colors duration-150 whitespace-nowrap ${
-        active ? 'bg-charcoal text-white border-charcoal' : 'bg-white text-charcoal border-border hover:border-charcoal/40'
-      }`}
+      className={`text-sm font-medium px-4 py-1.5 rounded-full border transition-colors duration-150 whitespace-nowrap ${active ? 'bg-charcoal text-white border-charcoal' : 'bg-white text-charcoal border-border hover:border-charcoal/40'
+        }`}
     >
       {label}
     </button>
@@ -61,15 +61,26 @@ function ProfessionalCard({ pro }) {
       <div className="flex gap-4">
         <InitialAvatar name={pro.name} />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            {pro.verified && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-sage px-2 py-0.5 bg-sage/10 rounded-full">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                Verified
-              </span>
-            )}
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            {/* Use VerifiedBadge for real DB-backed professionals (has verification_status field)
+                and the legacy static 'verified' flag for static demo data */}
+            {pro.verification_status !== undefined
+              ? (
+                <VerifiedBadge
+                  verificationStatus={pro.verification_status}
+                  isSuspended={pro.is_suspended}
+                  size="sm"
+                />
+              )
+              : pro.verified && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-sage px-2 py-0.5 bg-sage/10 rounded-full">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Verified
+                </span>
+              )
+            }
             <Badge label={pro.badge} color={pro.badgeColor} />
           </div>
           <h2 className="text-sm font-bold text-charcoal leading-snug truncate">{pro.name}</h2>

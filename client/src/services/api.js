@@ -85,6 +85,33 @@ export const coursesApi = {
     }),
 }
 
+// ── Professional endpoints ─────────────────────────────────────────────────────
+
+export const professionalsApi = {
+  /** GET /api/professionals — public approved professional directory */
+  list: ({ search, specialization, page, limit } = {}) => {
+    const params = new URLSearchParams()
+    if (search) params.set('search', search)
+    if (specialization) params.set('specialization', specialization)
+    if (page) params.set('page', page)
+    if (limit) params.set('limit', limit)
+    const qs = params.toString()
+    return request(`/api/professionals${qs ? `?${qs}` : ''}`)
+  },
+
+  /** GET /api/professionals/:id — public single profile (approved only) */
+  get: (id) => request(`/api/professionals/${id}`),
+
+  /** GET /api/professionals/me — own profile (professional role) */
+  getMine: () => request('/api/professionals/me'),
+
+  /** POST /api/professionals — submit or resubmit own profile (professional role) */
+  submitProfile: (body) => request('/api/professionals', { method: 'POST', body: JSON.stringify(body) }),
+
+  /** PATCH /api/professionals/me — update own profile (professional role) */
+  updateProfile: (body) => request('/api/professionals/me', { method: 'PATCH', body: JSON.stringify(body) }),
+}
+
 // ── Enrollment endpoints ──────────────────────────────────────────────────────
 
 export const enrollmentApi = {
@@ -124,10 +151,21 @@ export const adminApi = {
 
   // ── Professional approvals ─────────────────────────────────────────────────
   getPendingProfessionals: () => request('/api/admin/professionals/pending'),
+  getAllProfessionals: ({ status } = {}) => {
+    const params = new URLSearchParams()
+    if (status) params.set('status', status)
+    const qs = params.toString()
+    return request(`/api/admin/professionals${qs ? `?${qs}` : ''}`)
+  },
   approveProfile: (id) => request(`/api/admin/professionals/${id}/approve`, { method: 'PATCH' }),
   rejectProfile: (id, reason) => request(`/api/admin/professionals/${id}/reject`, {
     method: 'PATCH', body: JSON.stringify({ reason }),
   }),
+  suspendProfile: (id, { notes, reverification_due_at } = {}) =>
+    request(`/api/admin/professionals/${id}/suspend`, {
+      method: 'PATCH', body: JSON.stringify({ notes, reverification_due_at }),
+    }),
+  unsuspendProfile: (id) => request(`/api/admin/professionals/${id}/unsuspend`, { method: 'PATCH' }),
 
   // ── Enrollment management ──────────────────────────────────────────────────
   listEnrollments: ({ course_id, user_id, status, page = 1, limit = 20 } = {}) => {

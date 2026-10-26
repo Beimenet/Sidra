@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth, FAMILY_ROLES, getRoleLabel } from '../context/AuthContext.jsx'
+import { useAuth, FAMILY_ROLES, getRoleLabel, isProfessional } from '../context/AuthContext.jsx'
 import RoleAvatar from '../components/common/RoleAvatar.jsx'
+import VerifiedBadge, { isVerified } from '../components/common/VerifiedBadge.jsx'
+import { professionalsApi } from '../services/api.js'
 
 // ── Role badge ────────────────────────────────────────────────────────────────
 function RoleBadge({ value }) {
@@ -68,6 +70,20 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [nameError, setNameError] = useState('')
 
+  // Professional profile state — only loaded when user.role === 'professional'
+  const [proProfile, setProProfile] = useState(null)
+  const [proLoading, setProLoading] = useState(false)
+
+  useEffect(() => {
+    if (isProfessional(user)) {
+      setProLoading(true)
+      professionalsApi.getMine()
+        .then((data) => setProProfile(data.profile ?? null))
+        .catch(() => setProProfile(null))
+        .finally(() => setProLoading(false))
+    }
+  }, [user])
+
   async function handleLogout() {
     await logout()
     navigate('/')
@@ -101,7 +117,12 @@ export default function ProfilePage() {
 
     setSaving(true)
     try {
-      await updateProfile({ name: editName.trim(), familyRole: editRole || undefined })
+      const updates = { name: editName.trim() }
+      // Only pass familyRole for non-professional accounts
+      if (!isProfessional(user)) {
+        updates.familyRole = editRole || undefined
+      }
+      await updateProfile(updates)
       setSaveSuccess(true)
       setEditing(false)
     } catch (err) {
@@ -173,18 +194,94 @@ export default function ProfilePage() {
               <div className="flex items-center gap-5">
                 <RoleAvatar role={user.role ?? null} size={80} />
                 <div>
-                  <p className="text-xl font-bold text-charcoal">{user.name}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-xl font-bold text-charcoal">{user.name}</p>
+                    {proProfile && (
+                      <VerifiedBadge
+                        verificationStatus={proProfile.verification_status}
+                        isSuspended={proProfile.is_suspended}
+                        size="lg"
+                      />
+                    )}
+                  </div>
                   <p className="text-sm text-warm-gray mt-0.5">{user.email}</p>
+                  {isProfessional(user) && (
+                    <p className="text-xs font-semibold text-[#4389C7] mt-0.5">Professional account</p>
+                  )}
                 </div>
               </div>
 
               {/* Role */}
               <div className="bg-cream rounded-xl p-4 flex items-center gap-3">
                 <span className="text-xs font-semibold uppercase tracking-wider text-warm-gray w-24 flex-shrink-0">
-                  Family role
+                  {isProfessional(user) ? 'Account role' : 'Family role'}
                 </span>
                 <RoleBadge value={user.role} />
               </div>
+
+              {/* Professional profile section */}
+              {isProfessional(user) && (
+                <div className="bg-[#E5EEF8] border border-[#4389C7]/25 rounded-xl p-4 flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-charcoal">Professional Profile</p>
+                    {proLoading && (
+                      <span className="text-xs text-warm-gray">Loading…</span>
+                    )}
+                    {!proLoading && proProfile && (
+                      <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize
+                        ${proProfile.verification_status === 'approved' && !proProfile.is_suspended
+                          ? 'bg-[#4389C7]/15 text-[#4389C7]'
+                          : proProfile.is_suspended
+                            ? 'bg-amber-50 text-amber-700'
+                            : proProfile.verification_status === 'rejected'
+                              ? 'bg-red-50 text-red-700'
+                              : 'bg-amber-50 text-amber-700'
+                        }`}>
+                        {proProfile.is_suspended
+                          ? 'Suspended'
+                          : proProfile.verification_status === 'approved'
+                            ? '✓ Verified'
+                            : proProfile.verification_status === 'rejected'
+                              ? 'Rejected'
+                              : 'Pending review'}
+                      </span>
+                    )}
+                  </div>
+                  {!proLoading && !proProfile && (
+                    <p className="text-sm text-warm-gray">
+                      You have not submitted a professional profile yet.
+                    </p>
+                  )}
+                  {!proLoading && proProfile && (
+                    <>
+                      <p className="text-sm text-charcoal leading-relaxed line-clamp-2">{proProfile.bio}</p>
+                      <p className="text-xs text-warm-gray">
+                        <strong className="text-charcoal">Specialization:</strong> {proProfile.specialization}
+                      </p>
+                      {proProfile.institution_name && (
+                        <p className="text-xs text-warm-gray">
+                          <strong className="text-charcoal">Institution:</strong> {proProfile.institution_name}
+                        </p>
+                      )}
+                      {proProfile.verification_status === 'rejected' && proProfile.rejection_reason && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-1">
+                          <p className="text-xs font-semibold text-red-700 mb-0.5">Rejection reason</p>
+                          <p className="text-xs text-red-700 leading-relaxed">{proProfile.rejection_reason}</p>
+                        </div>
+                      )}
+                      {proProfile.is_suspended && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-1">
+                          <p className="text-xs font-semibold text-amber-700 mb-0.5">Account suspended</p>
+                          <p className="text-xs text-amber-700 leading-relaxed">
+                            Your professional profile has been suspended by an administrator.
+                            Contact support for more information.
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
 
               {/* Email note */}
               <p className="text-xs text-warm-gray/80 bg-white border border-border rounded-lg px-3 py-2">
@@ -244,8 +341,10 @@ export default function ProfilePage() {
                 <p className="text-xs text-warm-gray/70">Email cannot be edited at this time.</p>
               </div>
 
-              {/* Role */}
-              <RoleSelector value={editRole} onChange={setEditRole} />
+              {/* Role — only editable for parent accounts */}
+              {!isProfessional(user) && (
+                <RoleSelector value={editRole} onChange={setEditRole} />
+              )}
 
               {/* Save error */}
               {saveError && (

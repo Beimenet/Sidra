@@ -39,8 +39,11 @@ import {
 import {
   findProfileById,
   listPendingProfiles,
+  listAllProfiles,
   approveProfile,
   rejectProfile,
+  suspendProfile,
+  unsuspendProfile,
 } from '../models/professionalProfileModel.js'
 
 const router = Router()
@@ -274,6 +277,32 @@ router.get('/professionals/pending', async (req, res, next) => {
 })
 
 /**
+ * GET /api/admin/professionals
+ * List ALL professional profiles regardless of status.
+ * Supports optional status filter: ?status=approved|pending|rejected
+ */
+router.get('/professionals', async (req, res, next) => {
+  try {
+    const { status } = req.query
+    let profiles = await listAllProfiles()
+
+    if (status) {
+      const VALID = ['approved', 'pending', 'rejected']
+      if (!VALID.includes(status)) {
+        return res.status(400).json({
+          error: { message: `Invalid status filter. Must be one of: ${VALID.join(', ')}` },
+        })
+      }
+      profiles = profiles.filter((p) => p.verification_status === status)
+    }
+
+    return res.status(200).json({ profiles })
+  } catch (err) {
+    next(err)
+  }
+})
+
+/**
  * PATCH /api/admin/professionals/:id/approve
  * Approve a professional application.
  * Safe against duplicate approvals — re-approving an already-approved
@@ -340,6 +369,89 @@ router.patch('/professionals/:id/reject', async (req, res, next) => {
     return res.status(200).json({
       profile: updated,
       message: 'Professional application rejected.',
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// ═════════════════════════════════════════════════════════════════════════════
+// TASK 7C — Professional Suspension / Re-verification
+// ═════════════════════════════════════════════════════════════════════════════
+
+/**
+ * PATCH /api/admin/professionals/:id/suspend
+ * Suspend a previously approved professional.
+ * The profile keeps its 'approved' status but is hidden from the public
+ * directory and the VerifiedBadge is suppressed.
+ *
+ * Body: { notes?: string, reverification_due_at?: string (ISO date) }
+ */
+router.patch('/professionals/:id/suspend', async (req, res, next) => {
+  try {
+    const { id } = req.params
+    if (!isUUID(id)) {
+      return res.status(400).json({ error: { message: 'Invalid profile ID format.' } })
+    }
+
+    const profile = await findProfileById(id)
+    if (!profile) {
+      return res.status(404).json({ error: { message: 'Professional profile not found.' } })
+    }
+
+    if (profile.verification_status !== 'approved') {
+      return res.status(400).json({
+        error: { message: 'Only approved professionals can be suspended.' },
+      })
+    }
+
+    if (profile.is_suspended) {
+      return res.status(200).json({
+        profile,
+        message: 'This professional is already suspended.',
+      })
+    }
+
+    const notes = typeof req.body.notes === 'string' ? req.body.notes.trim() || null : null
+    const reverificationDueAt = req.body.reverification_due_at || null
+
+    const updated = await suspendProfile(id, req.user.id, notes, reverificationDueAt)
+    return res.status(200).json({
+      profile: updated,
+      message: 'Professional suspended. They are no longer visible in the public directory.',
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+/**
+ * PATCH /api/admin/professionals/:id/unsuspend
+ * Lift a suspension on a professional profile.
+ */
+router.patch('/professionals/:id/unsuspend', async (req, res, next) => {
+  try {
+    const { id } = req.params
+    if (!isUUID(id)) {
+      return res.status(400).json({ error: { message: 'Invalid profile ID format.' } })
+    }
+
+    const profile = await findProfileById(id)
+    if (!profile) {
+      return res.status(404).json({ error: { message: 'Professional profile not found.' } })
+    }
+
+    if (!profile.is_suspended) {
+      return res.status(200).json({
+        profile,
+        message: 'This professional is not currently suspended.',
+      })
+    }
+
+    const updated = await unsuspendProfile(id, req.user.id)
+    return res.status(200).json({
+      profile: updated,
+      message: 'Suspension lifted. The professional is visible in the public directory again.',
     })
   } catch (err) {
     next(err)

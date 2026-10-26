@@ -28,7 +28,7 @@
 
 import { Router } from 'express'
 import { authenticate } from '../middleware/authenticate.js'
-import { requireRole }  from '../middleware/requireRole.js'
+import { requireRole } from '../middleware/requireRole.js'
 import {
   upsertProfile,
   findProfileByUserId,
@@ -71,7 +71,7 @@ router.get('/', async (req, res, next) => {
   try {
     const { search = '', specialization = '', page = 1, limit = 20 } = req.query
 
-    const safePage  = Math.max(1, parseInt(page, 10)  || 1)
+    const safePage = Math.max(1, parseInt(page, 10) || 1)
     const safeLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20))
 
     // Fetch all approved profiles and apply in-memory filtering.
@@ -96,14 +96,14 @@ router.get('/', async (req, res, next) => {
       )
     }
 
-    const total  = profiles.length
+    const total = profiles.length
     const offset = (safePage - 1) * safeLimit
-    const paged  = profiles.slice(offset, offset + safeLimit).map(publicProfile)
+    const paged = profiles.slice(offset, offset + safeLimit).map(publicProfile)
 
     return res.status(200).json({
       professionals: paged,
       total,
-      page:  safePage,
+      page: safePage,
       limit: safeLimit,
       pages: Math.ceil(total / safeLimit),
     })
@@ -153,7 +153,7 @@ router.get('/:professionalId', async (req, res, next) => {
     if (sessionId) {
       try {
         const { findSession } = await import('../utils/session.js')
-        const { findUserById }  = await import('../models/userModel.js')
+        const { findUserById } = await import('../models/userModel.js')
         const session = await findSession(sessionId)
         if (session) {
           const user = await findUserById(session.user_id)
@@ -162,8 +162,8 @@ router.get('/:professionalId', async (req, res, next) => {
       } catch (_) { /* treat as unauthenticated */ }
     }
 
-    // Non-admins can only see approved profiles
-    if (profile.verification_status !== 'approved' && !isAdmin) {
+    // Non-admins can only see approved, non-suspended profiles
+    if ((profile.verification_status !== 'approved' || profile.is_suspended) && !isAdmin) {
       return res.status(404).json({ error: { message: 'Professional profile not found.' } })
     }
 
@@ -189,7 +189,11 @@ router.get('/:professionalId', async (req, res, next) => {
  */
 router.post('/', authenticate, requireRole('professional'), async (req, res, next) => {
   try {
-    const { specialization, bio, qualifications } = req.body
+    const {
+      specialization, bio, qualifications,
+      professional_category, institution_name, license_number,
+      license_authority, license_expires_at, years_experience, workplace,
+    } = req.body
 
     // ── Validation ────────────────────────────────────────────────────────────
     const fields = {}
@@ -207,10 +211,17 @@ router.post('/', authenticate, requireRole('professional'), async (req, res, nex
     }
 
     const profile = await upsertProfile({
-      user_id:        req.user.id,
+      user_id: req.user.id,
       specialization: specialization.trim(),
-      bio:            bio.trim(),
+      bio: bio.trim(),
       qualifications: qualifications.trim(),
+      professional_category: professional_category?.trim() || null,
+      institution_name: institution_name?.trim() || null,
+      license_number: license_number?.trim() || null,
+      license_authority: license_authority?.trim() || null,
+      license_expires_at: license_expires_at || null,
+      years_experience: years_experience ?? null,
+      workplace: workplace?.trim() || null,
     })
 
     return res.status(201).json({
@@ -238,19 +249,30 @@ router.patch('/me', authenticate, requireRole('professional'), async (req, res, 
       })
     }
 
-    const { specialization, bio, qualifications } = req.body
+    const {
+      specialization, bio, qualifications,
+      professional_category, institution_name, license_number,
+      license_authority, license_expires_at, years_experience, workplace,
+    } = req.body
 
     // Merge with existing values (allow partial updates)
     const merged = {
       specialization: specialization?.trim() ?? existing.specialization,
-      bio:            bio?.trim()            ?? existing.bio,
+      bio: bio?.trim() ?? existing.bio,
       qualifications: qualifications?.trim() ?? existing.qualifications,
+      professional_category: professional_category?.trim() ?? existing.professional_category ?? null,
+      institution_name: institution_name?.trim() ?? existing.institution_name ?? null,
+      license_number: license_number?.trim() ?? existing.license_number ?? null,
+      license_authority: license_authority?.trim() ?? existing.license_authority ?? null,
+      license_expires_at: license_expires_at ?? existing.license_expires_at ?? null,
+      years_experience: years_experience ?? existing.years_experience ?? null,
+      workplace: workplace?.trim() ?? existing.workplace ?? null,
     }
 
     // ── Validate merged result ─────────────────────────────────────────────────
     const fields = {}
     if (merged.specialization.length < 3) fields.specialization = 'Specialization must be at least 3 characters.'
-    if (merged.bio.length < 20)           fields.bio            = 'Bio must be at least 20 characters.'
+    if (merged.bio.length < 20) fields.bio = 'Bio must be at least 20 characters.'
     if (merged.qualifications.length < 5) fields.qualifications = 'Qualifications must be at least 5 characters.'
 
     if (Object.keys(fields).length > 0) {

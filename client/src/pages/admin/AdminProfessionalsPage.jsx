@@ -3,11 +3,25 @@ import { adminApi } from '../../services/api.js'
 import DashboardLayout from '../../components/dashboard/DashboardLayout.jsx'
 import DashboardPageHeader from '../../components/dashboard/DashboardPageHeader.jsx'
 import DashboardEmptyState from '../../components/dashboard/DashboardEmptyState.jsx'
+import VerifiedBadge from '../../components/common/VerifiedBadge.jsx'
 
 const breadcrumb = [{ label: 'Admin', to: '/admin' }, { label: 'Professional Approvals' }]
 
+const STATUS_TABS = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'rejected', label: 'Rejected' },
+]
+
 // ── Status badge ───────────────────────────────────────────────────────────
-function StatusBadge({ status }) {
+function StatusBadge({ status, isSuspended }) {
+  if (status === 'approved' && isSuspended) {
+    return (
+      <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700">
+        Suspended
+      </span>
+    )
+  }
   const map = {
     pending: 'bg-amber-50 text-amber-700',
     approved: 'bg-sage/25 text-charcoal',
@@ -57,25 +71,36 @@ function ConfirmDialog({ title, message, confirmLabel, confirmClass = 'btn-prima
 }
 
 // ── Profile card ───────────────────────────────────────────────────────────
-function ProfileCard({ profile, onApprove, onReject }) {
+function ProfileCard({ profile, onApprove, onReject, onSuspend, onUnsuspend }) {
   const [expanded, setExpanded] = useState(false)
   const isPending = profile.verification_status === 'pending'
+  const isApproved = profile.verification_status === 'approved'
+  const isSuspended = !!profile.is_suspended
 
   return (
     <div className="card p-5 flex flex-col gap-4">
       {/* Header row */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          {/* Avatar */}
+          {/* Initial avatar */}
           <div className="w-11 h-11 rounded-full bg-terracotta/15 text-terracotta text-base font-bold flex items-center justify-center flex-shrink-0 select-none">
             {(profile.full_name ?? '?')[0].toUpperCase()}
           </div>
           <div>
-            <p className="text-sm font-semibold text-charcoal">{profile.full_name}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-semibold text-charcoal">{profile.full_name}</p>
+              {/* Show badge only when approved and not suspended */}
+              <VerifiedBadge
+                verificationStatus={profile.verification_status}
+                isSuspended={profile.is_suspended}
+                size="sm"
+                showTooltip={false}
+              />
+            </div>
             <p className="text-xs text-warm-gray">{profile.email}</p>
           </div>
         </div>
-        <StatusBadge status={profile.verification_status} />
+        <StatusBadge status={profile.verification_status} isSuspended={profile.is_suspended} />
       </div>
 
       {/* Specialization */}
@@ -83,6 +108,18 @@ function ProfileCard({ profile, onApprove, onReject }) {
         <span className="text-xs font-semibold text-warm-gray uppercase tracking-wide">Specialty:</span>
         <span className="text-sm text-charcoal">{profile.specialization}</span>
       </div>
+
+      {/* Reverification due */}
+      {isSuspended && profile.reverification_due_at && (
+        <div className="flex items-center gap-2 bg-amber-50 rounded-lg px-3 py-2">
+          <svg className="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          <span className="text-xs text-amber-700">
+            Re-verification due: <strong>{new Date(profile.reverification_due_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+          </span>
+        </div>
+      )}
 
       {/* Expandable details */}
       <button
@@ -104,11 +141,46 @@ function ProfileCard({ profile, onApprove, onReject }) {
             <p className="text-xs font-semibold uppercase tracking-wide text-warm-gray mb-1">Bio</p>
             <p className="text-charcoal leading-relaxed">{profile.bio}</p>
           </div>
+          {/* Extended credential fields */}
+          {(profile.institution_name || profile.license_number || profile.years_experience != null) && (
+            <div className="flex flex-col gap-1.5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-warm-gray mb-0.5">Credentials</p>
+              {profile.institution_name && (
+                <p className="text-xs text-charcoal"><span className="text-warm-gray">Institution:</span> {profile.institution_name}</p>
+              )}
+              {profile.license_number && (
+                <p className="text-xs text-charcoal"><span className="text-warm-gray">License #:</span> {profile.license_number}</p>
+              )}
+              {profile.license_authority && (
+                <p className="text-xs text-charcoal"><span className="text-warm-gray">Issued by:</span> {profile.license_authority}</p>
+              )}
+              {profile.license_expires_at && (
+                <p className="text-xs text-charcoal"><span className="text-warm-gray">Expires:</span> {new Date(profile.license_expires_at).toLocaleDateString('en-GB')}</p>
+              )}
+              {profile.years_experience != null && (
+                <p className="text-xs text-charcoal"><span className="text-warm-gray">Experience:</span> {profile.years_experience} years</p>
+              )}
+              {profile.workplace && (
+                <p className="text-xs text-charcoal"><span className="text-warm-gray">Workplace:</span> {profile.workplace}</p>
+              )}
+            </div>
+          )}
           {profile.rejection_reason && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <p className="text-xs font-semibold text-red-700 mb-1">Rejection reason</p>
               <p className="text-red-700 text-xs leading-relaxed">{profile.rejection_reason}</p>
             </div>
+          )}
+          {profile.review_notes && (
+            <div className="bg-white border border-border rounded-lg p-3">
+              <p className="text-xs font-semibold text-warm-gray mb-1">Review notes</p>
+              <p className="text-charcoal text-xs leading-relaxed">{profile.review_notes}</p>
+            </div>
+          )}
+          {profile.reviewed_at && (
+            <p className="text-xs text-warm-gray">
+              Last reviewed {new Date(profile.reviewed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
           )}
           <p className="text-xs text-warm-gray">
             Submitted {new Date(profile.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -116,39 +188,65 @@ function ProfileCard({ profile, onApprove, onReject }) {
         </div>
       )}
 
-      {/* Actions — only shown for pending */}
-      {isPending && (
-        <div className="flex gap-3 pt-1 border-t border-border">
+      {/* Actions */}
+      <div className="flex gap-3 pt-1 border-t border-border flex-wrap">
+        {/* Pending → approve / reject */}
+        {isPending && (
+          <>
+            <button type="button" onClick={() => onApprove(profile)} className="btn-primary flex-1 py-2 text-sm">
+              ✓ Approve
+            </button>
+            <button
+              type="button"
+              onClick={() => onReject(profile)}
+              className="flex-1 py-2 text-sm font-semibold rounded-lg border-2 border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+            >
+              ✕ Reject
+            </button>
+          </>
+        )}
+
+        {/* Approved → suspend (if not suspended) */}
+        {isApproved && !isSuspended && (
           <button
             type="button"
-            onClick={() => onApprove(profile)}
-            className="btn-primary flex-1 py-2 text-sm"
+            onClick={() => onSuspend(profile)}
+            className="flex-1 py-2 text-sm font-semibold rounded-lg border-2 border-amber-300 text-amber-700 hover:bg-amber-50 transition-colors"
           >
-            ✓ Approve
+            ⚠ Suspend
           </button>
+        )}
+
+        {/* Approved + Suspended → lift suspension */}
+        {isApproved && isSuspended && (
           <button
             type="button"
-            onClick={() => onReject(profile)}
-            className="flex-1 py-2 text-sm font-semibold rounded-lg border-2 border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+            onClick={() => onUnsuspend(profile)}
+            className="flex-1 py-2 text-sm font-semibold rounded-lg border-2 border-sage/60 text-charcoal hover:bg-sage/10 transition-colors"
           >
-            ✕ Reject
+            ↩ Lift Suspension
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
 
 // ── Page ───────────────────────────────────────────────────────────────────
 export default function AdminProfessionalsPage() {
+  const [activeTab, setActiveTab] = useState('pending')
   const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // Dialogs
+  // Dialog state
   const [approveTarget, setApproveTarget] = useState(null)
   const [rejectTarget, setRejectTarget] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [suspendTarget, setSuspendTarget] = useState(null)
+  const [suspendNotes, setSuspendNotes] = useState('')
+  const [suspendDue, setSuspendDue] = useState('')
+  const [unsuspendTarget, setUnsuspendTarget] = useState(null)
   const [actionLoading, setActionLoading] = useState(false)
   const [toast, setToast] = useState(null)
 
@@ -156,14 +254,14 @@ export default function AdminProfessionalsPage() {
     setLoading(true)
     setError('')
     try {
-      const res = await adminApi.getPendingProfessionals()
+      const res = await adminApi.getAllProfessionals({ status: activeTab })
       setProfiles(res.profiles ?? [])
     } catch (err) {
-      setError(err.message ?? 'Could not load applications.')
+      setError(err.message ?? 'Could not load profiles.')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [activeTab])
 
   useEffect(() => { fetchProfiles() }, [fetchProfiles])
 
@@ -200,13 +298,72 @@ export default function AdminProfessionalsPage() {
     }
   }
 
+  // ── Suspend ────────────────────────────────────────────────────────────
+  async function confirmSuspend() {
+    if (!suspendTarget) return
+    setActionLoading(true)
+    try {
+      await adminApi.suspendProfile(suspendTarget.id, {
+        notes: suspendNotes.trim() || undefined,
+        reverification_due_at: suspendDue || undefined,
+      })
+      setToast({ message: `${suspendTarget.full_name} suspended.`, type: 'success' })
+      await fetchProfiles()
+    } catch (err) {
+      setToast({ message: err.message ?? 'Suspension failed.', type: 'error' })
+    } finally {
+      setActionLoading(false)
+      setSuspendTarget(null)
+      setSuspendNotes('')
+      setSuspendDue('')
+    }
+  }
+
+  // ── Unsuspend ──────────────────────────────────────────────────────────
+  async function confirmUnsuspend() {
+    if (!unsuspendTarget) return
+    setActionLoading(true)
+    try {
+      await adminApi.unsuspendProfile(unsuspendTarget.id)
+      setToast({ message: `Suspension lifted for ${unsuspendTarget.full_name}.`, type: 'success' })
+      await fetchProfiles()
+    } catch (err) {
+      setToast({ message: err.message ?? 'Could not lift suspension.', type: 'error' })
+    } finally {
+      setActionLoading(false)
+      setUnsuspendTarget(null)
+    }
+  }
+
+  const pendingCount = activeTab === 'pending' ? profiles.length : undefined
+
   return (
     <DashboardLayout title="Professional Approvals" breadcrumb={breadcrumb}>
 
       <DashboardPageHeader
-        title="Pending Applications"
-        subtitle={loading ? 'Loading…' : `${profiles.length} application${profiles.length !== 1 ? 's' : ''} awaiting review`}
+        title="Professional Profiles"
+        subtitle="Review, approve, reject and suspend professional applications"
       />
+
+      {/* Tabs */}
+      <div className="flex gap-1 mb-6 border-b border-border" role="tablist">
+        {STATUS_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.value}
+            onClick={() => setActiveTab(tab.value)}
+            className={`px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors duration-150 -mb-px
+              ${activeTab === tab.value
+                ? 'border-terracotta text-terracotta bg-terracotta/5'
+                : 'border-transparent text-warm-gray hover:text-charcoal hover:border-border'
+              }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {/* Error */}
       {error && (
@@ -216,13 +373,12 @@ export default function AdminProfessionalsPage() {
         </div>
       )}
 
-      {/* Info note */}
-      {!loading && !error && (
+      {/* Info note for pending tab */}
+      {!loading && !error && activeTab === 'pending' && (
         <div className="mb-6 flex gap-3 bg-white border border-border rounded-xl p-4 text-sm text-warm-gray">
           <span className="text-terracotta flex-shrink-0" aria-hidden="true">ℹ️</span>
           <span>
-            This page shows <strong className="text-charcoal">pending</strong> applications.
-            Approved and rejected profiles appear in the public professional directory once approved.
+            Approved profiles appear in the public directory. Use the <strong className="text-charcoal">Approved</strong> tab to manage verified professionals, including suspension.
           </span>
         </div>
       )}
@@ -230,13 +386,19 @@ export default function AdminProfessionalsPage() {
       {/* Loading */}
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="w-10 h-10 rounded-full border-4 border-terracotta/30 border-t-terracotta animate-spin" role="status" aria-label="Loading applications" />
+          <div className="w-10 h-10 rounded-full border-4 border-terracotta/30 border-t-terracotta animate-spin" role="status" aria-label="Loading profiles" />
         </div>
       ) : profiles.length === 0 ? (
         <div className="card overflow-hidden">
           <DashboardEmptyState
-            title="No pending applications"
-            message="Professional profile applications awaiting your review will appear here when professionals submit their applications."
+            title={`No ${activeTab} applications`}
+            message={
+              activeTab === 'pending'
+                ? 'Applications awaiting review will appear here.'
+                : activeTab === 'approved'
+                  ? 'No approved professionals yet.'
+                  : 'No rejected applications.'
+            }
           />
         </div>
       ) : (
@@ -247,6 +409,8 @@ export default function AdminProfessionalsPage() {
               profile={profile}
               onApprove={setApproveTarget}
               onReject={p => { setRejectTarget(p); setRejectReason('') }}
+              onSuspend={p => { setSuspendTarget(p); setSuspendNotes(''); setSuspendDue('') }}
+              onUnsuspend={setUnsuspendTarget}
             />
           ))}
         </div>
@@ -276,12 +440,58 @@ export default function AdminProfessionalsPage() {
           <textarea
             value={rejectReason}
             onChange={e => setRejectReason(e.target.value)}
-            placeholder="Optional: reason for rejection (will be stored with the application)"
+            placeholder="Optional: reason for rejection (shown to the applicant)"
             rows={3}
             className="w-full text-sm border border-border rounded-lg px-3 py-2.5 bg-white text-charcoal placeholder:text-warm-gray/60 focus:outline-none focus:ring-2 focus:ring-terracotta resize-none"
             aria-label="Rejection reason"
           />
         </ConfirmDialog>
+      )}
+
+      {/* Suspend confirm */}
+      {suspendTarget && (
+        <ConfirmDialog
+          title="Suspend professional?"
+          message={`${suspendTarget.full_name}'s profile will be hidden from the public directory and their Verified badge will be suppressed. Their account remains active.`}
+          confirmLabel={actionLoading ? 'Suspending…' : 'Suspend'}
+          confirmClass="inline-flex items-center justify-center px-5 py-2 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors"
+          onConfirm={confirmSuspend}
+          onCancel={() => { setSuspendTarget(null); setSuspendNotes(''); setSuspendDue('') }}
+        >
+          <div className="flex flex-col gap-3">
+            <textarea
+              value={suspendNotes}
+              onChange={e => setSuspendNotes(e.target.value)}
+              placeholder="Optional: internal notes about this suspension"
+              rows={2}
+              className="w-full text-sm border border-border rounded-lg px-3 py-2.5 bg-white text-charcoal placeholder:text-warm-gray/60 focus:outline-none focus:ring-2 focus:ring-terracotta resize-none"
+              aria-label="Suspension notes"
+            />
+            <div className="flex flex-col gap-1">
+              <label htmlFor="reverification-date" className="text-xs font-semibold text-warm-gray">
+                Re-verification due date (optional)
+              </label>
+              <input
+                id="reverification-date"
+                type="date"
+                value={suspendDue}
+                onChange={e => setSuspendDue(e.target.value)}
+                className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-white text-charcoal focus:outline-none focus:ring-2 focus:ring-terracotta"
+              />
+            </div>
+          </div>
+        </ConfirmDialog>
+      )}
+
+      {/* Unsuspend confirm */}
+      {unsuspendTarget && (
+        <ConfirmDialog
+          title="Lift suspension?"
+          message={`${unsuspendTarget.full_name}'s profile will be restored to the public directory and their Verified badge will be displayed again.`}
+          confirmLabel={actionLoading ? 'Reinstating…' : 'Lift Suspension'}
+          onConfirm={confirmUnsuspend}
+          onCancel={() => setUnsuspendTarget(null)}
+        />
       )}
 
       {/* Toast */}

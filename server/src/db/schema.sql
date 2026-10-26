@@ -199,3 +199,36 @@ CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions (expires_at);
 -- ────────────────────────────────────────────────────────────
 ALTER TABLE professional_profiles
   ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+
+
+-- ────────────────────────────────────────────────────────────
+-- Migration 2025-02: extended professional_profiles fields
+-- All columns use ADD COLUMN IF NOT EXISTS — safe to re-run.
+-- ────────────────────────────────────────────────────────────
+
+-- Richer credential fields for the professional application form
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS professional_category TEXT;
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS institution_name       TEXT;
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS license_number         TEXT;
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS license_authority      TEXT;
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS license_expires_at     DATE;
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS years_experience       SMALLINT CHECK (years_experience IS NULL OR years_experience >= 0);
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS workplace              TEXT;
+
+-- Verification workflow fields
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS reviewed_by            UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS reviewed_at            TIMESTAMPTZ;
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS review_notes           TEXT;
+
+-- Suspension / reverification
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS is_suspended           BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS reverification_due_at  TIMESTAMPTZ;
+
+-- Extend verification_status to support richer workflow
+-- (safe: ADD COLUMN IF NOT EXISTS; existing CHECK is on TEXT so new values
+--  are stored fine if the app code accepts them.  To formally extend the
+--  CHECK constraint we would need a migration that drops+recreates it; for
+--  now the new statuses are guarded at the application layer.)
+ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS under_review_since     TIMESTAMPTZ;
+
+CREATE INDEX IF NOT EXISTS idx_prof_profiles_suspended ON professional_profiles (is_suspended);

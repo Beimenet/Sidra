@@ -17,8 +17,20 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { authApi } from '../services/api.js'
 
 // ── Role constants ────────────────────────────────────────────────────────────
-// These are the family/account roles supported by the platform.
-// Used in registration forms, profile selectors, and role-based avatar display.
+// Account roles and family roles are conceptually separate:
+//
+//   Account roles  — determine what a user can do on the platform
+//     'parent'       — a parent or caregiver (mother, father, guardian, etc.)
+//     'professional'  — a licensed professional (requires verification)
+//     'admin'         — platform administrator
+//
+//   Family roles   — describe the parent's relationship to their child
+//     'mother', 'father', 'legal_guardian', 'other_caregiver'
+//
+// In the database the users.role column stores either a family role
+// (for parent accounts) or 'professional' / 'admin' (for those account
+// types). The helpers below normalise this so components can check the
+// account role and family role independently.
 
 export const FAMILY_ROLES = [
   {
@@ -74,6 +86,42 @@ export function getRoleLabel(value) {
   return FAMILY_ROLES.find((r) => r.value === value)?.label ?? extra[value] ?? value
 }
 
+/**
+ * Returns the account-level role: 'parent' | 'professional' | 'admin'
+ * Family roles (mother, father, etc.) are mapped to 'parent'.
+ */
+export function getAccountRole(user) {
+  if (!user?.role) return null
+  if (user.role === 'professional') return 'professional'
+  if (user.role === 'admin') return 'admin'
+  return 'parent'   // mother, father, legal_guardian, other_caregiver
+}
+
+/** True if the user's account role is 'professional' */
+export function isProfessional(user) {
+  return user?.role === 'professional'
+}
+
+/** True if the user's account role is 'admin' */
+export function isAdmin(user) {
+  return user?.role === 'admin'
+}
+
+/** True if the user's account role is 'parent' (mother/father/guardian/caregiver) */
+export function isParent(user) {
+  const ar = getAccountRole(user)
+  return ar === 'parent'
+}
+
+/**
+ * Returns the family role for a parent user, or null for professionals/admins.
+ */
+export function getFamilyRole(user) {
+  if (!user?.role) return null
+  if (ALLOWED_ROLE_VALUES.includes(user.role)) return user.role
+  return null
+}
+
 // ── Normalise the backend user object ─────────────────────────────────────────
 // Backend returns: { id, full_name, email, role, is_active, created_at }
 // Frontend expects: { id, name, email, role, is_active, created_at }
@@ -111,14 +159,17 @@ export function AuthProvider({ children }) {
    * POST /api/auth/register. On success the server sets the session
    * cookie and returns the user profile.
    *
-   * @param {{ name, email, password, familyRole }} params
+   * For parent accounts: pass `familyRole` (mother/father/etc.)
+   * For professional accounts: pass `role: 'professional'` (no family role)
+   *
+   * @param {{ name, email, password, familyRole?, role? }} params
    */
-  async function register({ name, email, password, familyRole }) {
+  async function register({ name, email, password, familyRole, role }) {
     const data = await authApi.register({
       full_name: name,         // backend field name
       email,
       password,
-      role: familyRole,        // backend field name
+      role: role ?? familyRole,        // professional → 'professional'; parent → family role
     })
     const normalised = normaliseUser(data.user)
     setUser(normalised)
