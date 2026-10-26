@@ -34,9 +34,10 @@ export async function verifyPassword(plaintext, hash) {
 }
 
 /**
- * A pre-computed dummy hash used when no user was found during login.
+ * A pre-computed valid bcrypt hash used when no user was found during login.
  * Running bcrypt.compare against this keeps the response time
  * consistent with a real login attempt, preventing timing attacks.
+ * This is a real bcrypt hash (cost 12) — bcrypt.compare requires a valid hash.
  */
 export const DUMMY_HASH =
-  '$2a$12$dummyhashfortimingprotectionXXXXXXXXXXXXXXXXXXX'
+  '$2a$12$cW.W3m8gc6oKpdG4HHVMrOBZwf5Z.dhkvAXdQ6ArNn/ys5CRYsdYC'

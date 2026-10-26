@@ -26,14 +26,18 @@ import { useAuth } from './AuthContext.jsx'
 const SocketContext = createContext(null)
 
 // Direct backend URL — bypasses Vite proxy for WebSocket upgrades.
-// In dev this is http://localhost:5000; in production set VITE_SOCKET_URL.
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ?? 'http://localhost:5000'
+// In dev: connect directly to http://localhost:5000 (Vite proxy doesn't forward WS).
+// In production: if VITE_SOCKET_URL is set use it; otherwise use the current
+// window origin so the Vercel /socket.io/* rewrite handles the connection.
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL
+  ?? (import.meta.env.PROD ? window.location.origin : 'http://localhost:5000')
 
 export function SocketProvider({ children }) {
   const { user } = useAuth()
   const socketRef = useRef(null)
   const [connected, setConnected] = useState(false)
   const [authError, setAuthError] = useState(null)
+  const [socket, setSocket] = useState(null)   // reactive — triggers re-render for consumers
 
   useEffect(() => {
     // Only connect when there is a logged-in user
@@ -41,6 +45,7 @@ export function SocketProvider({ children }) {
       if (socketRef.current) {
         socketRef.current.disconnect()
         socketRef.current = null
+        setSocket(null)
         setConnected(false)
         setAuthError(null)
       }
@@ -50,46 +55,47 @@ export function SocketProvider({ children }) {
     // Avoid duplicate connections on hot-module reload
     if (socketRef.current?.connected) return
 
-    const socket = io(SOCKET_URL, {
-      path:             '/socket.io',
-      withCredentials:  true,   // send the HttpOnly sid cookie
-      transports:       ['websocket', 'polling'],
-      autoConnect:      true,
-      reconnection:     true,
+    const sock = io(SOCKET_URL, {
+      path: '/socket.io',
+      withCredentials: true,
+      transports: ['websocket', 'polling'],
+      autoConnect: true,
+      reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 8000,
       reconnectionAttempts: 10,
     })
 
-    socket.on('connect', () => {
+    sock.on('connect', () => {
       setConnected(true)
       setAuthError(null)
     })
 
-    socket.on('disconnect', () => {
+    sock.on('disconnect', () => {
       setConnected(false)
     })
 
-    socket.on('connect_error', (err) => {
+    sock.on('connect_error', (err) => {
       setConnected(false)
-      // AUTH_REQUIRED / SESSION_EXPIRED errors come from our handshake middleware
       if (['AUTH_REQUIRED', 'SESSION_EXPIRED', 'USER_INACTIVE', 'AUTH_ERROR'].includes(err.message)) {
         setAuthError(err.message)
-        socket.disconnect()
+        sock.disconnect()
       }
     })
 
-    socketRef.current = socket
+    socketRef.current = sock
+    setSocket(sock)   // expose to context consumers
 
     return () => {
-      socket.disconnect()
+      sock.disconnect()
       socketRef.current = null
+      setSocket(null)
       setConnected(false)
     }
   }, [user])
 
   return (
-    <SocketContext.Provider value={{ socket: socketRef.current, connected, authError }}>
+    <SocketContext.Provider value={{ socket, connected, authError }}>
       {children}
     </SocketContext.Provider>
   )

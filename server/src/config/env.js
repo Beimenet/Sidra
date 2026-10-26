@@ -1,5 +1,5 @@
 ﻿/**
- * env.js â€” centralised environment variable access
+ * env.js — centralised environment variable access
  *
  * All process.env reads go through this module so that missing
  * required variables are caught early with a clear error message
@@ -21,40 +21,36 @@ function optional(name, defaultValue = '') {
 }
 
 export const env = {
-  // â”€â”€ Server â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Server ────────────────────────────────────────────────────────────────
   PORT: optional('PORT', '5000'),
   NODE_ENV: optional('NODE_ENV', 'development'),
 
-  // â”€â”€ CORS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // ── CORS ──────────────────────────────────────────────────────────────────────
-  // Comma-separated list of allowed origins.
+  // ── CORS ──────────────────────────────────────────────────────────────────
+  // Comma-separated list of allowed frontend origins.
   //   development:  http://localhost:5173
   //   production:   https://sidra-pi-one.vercel.app
   //   both:         https://sidra-pi-one.vercel.app,http://localhost:5173
   CLIENT_ORIGIN: optional('CLIENT_ORIGIN', 'http://localhost:5173'),
 
-  // â”€â”€ Database â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Database ──────────────────────────────────────────────────────────────
   DB_HOST: optional('DB_HOST', 'localhost'),
   DB_PORT: optional('DB_PORT', '5432'),
   DB_NAME: required('DB_NAME'),
   DB_USER: required('DB_USER'),
   DB_PASSWORD: optional('DB_PASSWORD', ''),
 
-  // â”€â”€ Authentication â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // SESSION_SECRET: long random string used to sign cookies (optional
-  // signing â€” the session ID itself is already high-entropy).
-  // Generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+  // ── Authentication ────────────────────────────────────────────────────────
+  // Generate SESSION_SECRET with:
+  //   node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
   SESSION_SECRET: required('SESSION_SECRET'),
   SESSION_DURATION_DAYS: optional('SESSION_DURATION_DAYS', '7'),
 
-  // Cloudinary (optional until media uploads are enabled)
+  // ── Cloudinary (optional until media uploads are enabled) ─────────────────
   CLOUDINARY_CLOUD_NAME: optional('CLOUDINARY_CLOUD_NAME', ''),
   CLOUDINARY_API_KEY: optional('CLOUDINARY_API_KEY', ''),
   CLOUDINARY_API_SECRET: optional('CLOUDINARY_API_SECRET', ''),
 
-  // Socket.IO / chat
-  // In production on Render the client connects directly to the backend URL.
-  // VITE_SOCKET_URL is set in the client .env (not here).
-  // Nothing extra is needed server-side beyond CLIENT_ORIGIN (already required above).
+  // ── Socket.IO / Chat ──────────────────────────────────────────────────────
+  // The client connects directly to the backend via VITE_SOCKET_URL.
+  // Nothing extra is needed server-side beyond CLIENT_ORIGIN above.
 }
-

@@ -128,14 +128,3 @@ httpServer.listen(PORT, async () => {
 })
 
 export default app
-import cors from "cors"; // At the top of app.js
-
-// After creating app, BEFORE your API routes
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);

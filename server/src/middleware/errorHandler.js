@@ -10,7 +10,13 @@
 export function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-vars
   const isDev = process.env.NODE_ENV !== 'production'
 
-  const status  = err.status ?? err.statusCode ?? 500
+  // CORS rejections arrive here as plain Error objects with no status.
+  // Return 403 with a safe message rather than exposing the origin string.
+  if (err.message?.startsWith('CORS:')) {
+    return res.status(403).json({ error: { message: 'Forbidden.', status: 403 } })
+  }
+
+  const status = err.status ?? err.statusCode ?? 500
   const message = err.message ?? 'An unexpected error occurred.'
 
   // Log the full error server-side only
