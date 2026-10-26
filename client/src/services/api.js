@@ -125,6 +125,36 @@ export const enrollmentApi = {
   getProgress: (id) => request(`/api/enrollments/${id}/progress`),
 }
 
+// ── Media / Cloudinary upload endpoints ──────────────────────────────────────
+
+export const mediaApi = {
+  /**
+   * POST /api/media/sign
+   * Get a signed upload signature from the backend.
+   * @param {'thumbnail'|'video'} upload_type
+   * @returns {{ signature, timestamp, api_key, cloud_name, folder, ... }}
+   */
+  sign: (upload_type) =>
+    request('/api/media/sign', { method: 'POST', body: JSON.stringify({ upload_type }) }),
+
+  /**
+   * POST /api/media/confirm
+   * After a successful browser→Cloudinary upload, persist the metadata to the DB.
+   * @param {object} payload
+   */
+  confirm: (payload) =>
+    request('/api/media/confirm', { method: 'POST', body: JSON.stringify(payload) }),
+
+  /**
+   * DELETE /api/media/:upload_type/:record_id
+   * Remove a Cloudinary asset and clear the DB columns.
+   * @param {'thumbnail'|'video'} upload_type
+   * @param {string} record_id  — course UUID (thumbnail) or lesson UUID (video)
+   */
+  remove: (upload_type, record_id) =>
+    request(`/api/media/${upload_type}/${record_id}`, { method: 'DELETE' }),
+}
+
 // ── Admin endpoints ───────────────────────────────────────────────────────────
 
 export const adminApi = {
@@ -166,6 +196,29 @@ export const adminApi = {
       method: 'PATCH', body: JSON.stringify({ notes, reverification_due_at }),
     }),
   unsuspendProfile: (id) => request(`/api/admin/professionals/${id}/unsuspend`, { method: 'PATCH' }),
+
+  // ── Course management (admin) ──────────────────────────────────────────────
+  listAllCourses: () => request('/api/courses/all'),
+  createCourse: (body) => request('/api/courses', { method: 'POST', body: JSON.stringify(body) }),
+  updateCourse: (id, body) => request(`/api/courses/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  publishCourse: (id, published) => request(`/api/courses/${id}/publish`, {
+    method: 'PATCH', body: JSON.stringify({ published }),
+  }),
+  deleteCourse: (id) => request(`/api/courses/${id}`, { method: 'DELETE' }),
+
+  // ── Lesson management (admin) ──────────────────────────────────────────────
+  createLesson: (courseId, body) => request(`/api/courses/${courseId}/lessons`, {
+    method: 'POST', body: JSON.stringify(body),
+  }),
+  updateLesson: (courseId, lessonId, body) => request(`/api/courses/${courseId}/lessons/${lessonId}`, {
+    method: 'PATCH', body: JSON.stringify(body),
+  }),
+  deleteLesson: (courseId, lessonId) => request(`/api/courses/${courseId}/lessons/${lessonId}`, {
+    method: 'DELETE',
+  }),
+  reorderLessons: (courseId, order) => request(`/api/courses/${courseId}/lessons/reorder`, {
+    method: 'PATCH', body: JSON.stringify({ order }),
+  }),
 
   // ── Enrollment management ──────────────────────────────────────────────────
   listEnrollments: ({ course_id, user_id, status, page = 1, limit = 20 } = {}) => {

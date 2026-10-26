@@ -33,13 +33,13 @@ function levelColor(level) {
 
 // Thumbnail placeholder — coloured gradient using category
 const CATEGORY_GRADIENTS = {
-  'Parenting Fundamentals':               'from-terracotta/30 to-sage/30',
-  'Child Development':                    'from-sage/30 to-terracotta/20',
-  'Positive Parenting':                   'from-terracotta/20 to-cream',
-  'Child Behavior & Emotional Development':'from-sage/20 to-terracotta/30',
-  'Special & Inclusive Needs':            'from-terracotta/15 to-sage/40',
-  'Family Wellbeing':                     'from-sage/35 to-terracotta/15',
-  'Early Childhood Development':          'from-terracotta/25 to-sage/25',
+  'Parenting Fundamentals': 'from-terracotta/30 to-sage/30',
+  'Child Development': 'from-sage/30 to-terracotta/20',
+  'Positive Parenting': 'from-terracotta/20 to-cream',
+  'Child Behavior & Emotional Development': 'from-sage/20 to-terracotta/30',
+  'Special & Inclusive Needs': 'from-terracotta/15 to-sage/40',
+  'Family Wellbeing': 'from-sage/35 to-terracotta/15',
+  'Early Childhood Development': 'from-terracotta/25 to-sage/25',
 }
 
 export default function CourseCard({ course }) {
@@ -72,10 +72,12 @@ export default function CourseCard({ course }) {
           {formatPrice(course.price)}
         </span>
 
-        {/* Demo badge — top left */}
-        <span className="absolute top-3 left-3 px-2 py-0.5 bg-charcoal/70 text-white text-[10px] font-medium rounded">
-          Demo
-        </span>
+        {/* Demo badge — only for static demo courses, not real API courses */}
+        {!course.fromApi && (
+          <span className="absolute top-3 left-3 px-2 py-0.5 bg-charcoal/70 text-white text-[10px] font-medium rounded">
+            Demo
+          </span>
+        )}
       </div>
 
       {/* Body */}

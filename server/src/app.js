@@ -26,6 +26,7 @@ import authRouter from './routes/auth.js'
 import coursesRouter, { enrollmentsRouter } from './routes/courses.js'
 import professionalsRouter from './routes/professionals.js'
 import adminRouter from './routes/admin.js'
+import mediaRouter from './routes/media.js'
 
 // Middleware
 import { notFound } from './middleware/notFound.js'
@@ -69,6 +70,7 @@ app.use('/api/courses', coursesRouter)
 app.use('/api/enrollments', enrollmentsRouter)
 app.use('/api/professionals', professionalsRouter)
 app.use('/api/admin', adminRouter)
+app.use('/api/media', mediaRouter)
 
 // ── 404 + error handling ──────────────────────────────────────────────────────
 // Must be registered after all routes

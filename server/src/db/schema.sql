@@ -232,3 +232,26 @@ ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS reverification_due_at
 ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS under_review_since     TIMESTAMPTZ;
 
 CREATE INDEX IF NOT EXISTS idx_prof_profiles_suspended ON professional_profiles (is_suspended);
+
+
+-- ────────────────────────────────────────────────────────────
+-- Migration 2025-03: Cloudinary media fields
+-- Adds Cloudinary public_id, resource_type, and video metadata
+-- to both the courses and lessons tables.
+-- All statements are idempotent (ADD COLUMN IF NOT EXISTS).
+-- ────────────────────────────────────────────────────────────
+
+-- courses: thumbnail Cloudinary metadata
+ALTER TABLE courses
+  ADD COLUMN IF NOT EXISTS thumbnail_public_id TEXT,
+  ADD COLUMN IF NOT EXISTS thumbnail_resource_type TEXT DEFAULT 'image';
+
+-- lessons: video Cloudinary metadata + poster image
+ALTER TABLE lessons
+  ADD COLUMN IF NOT EXISTS video_public_id      TEXT,
+  ADD COLUMN IF NOT EXISTS video_resource_type  TEXT DEFAULT 'video',
+  ADD COLUMN IF NOT EXISTS video_duration_sec   INTEGER,
+  ADD COLUMN IF NOT EXISTS video_poster_url     TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_courses_thumbnail_pid  ON courses (thumbnail_public_id);
+CREATE INDEX IF NOT EXISTS idx_lessons_video_pid      ON lessons  (video_public_id);

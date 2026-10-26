@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { getCourseById, formatPrice } from '../data/courses.js'
 import PaymentModal from '../components/courses/PaymentModal.jsx'
+import VideoPlayer from '../components/courses/VideoPlayer.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { coursesApi } from '../services/api.js'
 
@@ -440,8 +441,23 @@ export default function CourseDetailPage() {
             <h2 id="preview-heading" className="text-xl font-bold text-charcoal mb-4">
               Course Preview
             </h2>
-            <VideoPlaceholder lesson={previewLesson} />
-            {previewLesson && (
+            {/* For API courses use VideoPlayer; for static demo use the placeholder */}
+            {apiCourse ? (
+              (() => {
+                // Find first lesson that has a video
+                const firstVideoLesson = (apiCourse.lessons ?? []).find(l => l.video_url)
+                return (
+                  <VideoPlayer
+                    src={firstVideoLesson?.video_url ?? null}
+                    poster={firstVideoLesson?.video_poster_url ?? null}
+                    title={firstVideoLesson?.title ?? course.title}
+                  />
+                )
+              })()
+            ) : (
+              <VideoPlaceholder lesson={previewLesson} />
+            )}
+            {previewLesson && !apiCourse && (
               <p className="mt-2 text-xs text-warm-gray">
                 Preview lesson: "{previewLesson.title}" · {previewLesson.duration}
               </p>
