@@ -255,3 +255,48 @@ ALTER TABLE lessons
 
 CREATE INDEX IF NOT EXISTS idx_courses_thumbnail_pid  ON courses (thumbnail_public_id);
 CREATE INDEX IF NOT EXISTS idx_lessons_video_pid      ON lessons  (video_public_id);
+
+
+-- ────────────────────────────────────────────────────────────
+-- Migration 2025-04: Real-time Chat — conversations & messages
+--
+-- conversations: a thread between exactly 2 participants.
+--   type: 'direct' (1-on-1) | 'circle' (group, future)
+--   Both participant UUIDs are stored directly on the row for
+--   fast access-check queries without a join table.
+--
+-- messages: individual chat messages within a conversation.
+--   sender_id is always the authenticated user's UUID.
+--   content is plain text for now (max 4000 chars enforced in app).
+--
+-- All statements are idempotent (CREATE IF NOT EXISTS).
+-- ────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS conversations (
+    id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    type            TEXT        NOT NULL DEFAULT 'direct'
+                                CHECK (type IN ('direct', 'circle')),
+    participant_a   UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    participant_b   UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    -- Prevent duplicate direct threads between the same pair of users.
+    -- canonical order: participant_a < participant_b (UUID lexicographic)
+    UNIQUE (participant_a, participant_b)
+);
+
+CREATE INDEX IF NOT EXISTS idx_conv_participant_a ON conversations (participant_a);
+CREATE INDEX IF NOT EXISTS idx_conv_participant_b ON conversations (participant_b);
+CREATE INDEX IF NOT EXISTS idx_conv_updated       ON conversations (updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS messages (
+    id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id UUID        NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id       UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content         TEXT        NOT NULL CHECK (char_length(trim(content)) >= 1
+                                               AND char_length(content) <= 4000),
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_messages_conv_created ON messages (conversation_id, created_at ASC);
+CREATE INDEX IF NOT EXISTS idx_messages_sender       ON messages (sender_id);

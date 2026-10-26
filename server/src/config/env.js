@@ -46,5 +46,10 @@ export const env = {
   CLOUDINARY_CLOUD_NAME: optional('CLOUDINARY_CLOUD_NAME', ''),
   CLOUDINARY_API_KEY: optional('CLOUDINARY_API_KEY', ''),
   CLOUDINARY_API_SECRET: optional('CLOUDINARY_API_SECRET', ''),
+
+  // Socket.IO / chat
+  // In production on Render the client connects directly to the backend URL.
+  // VITE_SOCKET_URL is set in the client .env (not here).
+  // Nothing extra is needed server-side beyond CLIENT_ORIGIN (already required above).
 }
 

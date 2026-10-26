@@ -125,6 +125,36 @@ export const enrollmentApi = {
   getProgress: (id) => request(`/api/enrollments/${id}/progress`),
 }
 
+// ── Chat / conversation endpoints ────────────────────────────────────────────
+
+export const chatApi = {
+  /** GET /api/chat/users/search?q=... — find users to start a chat with */
+  searchUsers: (q) => request(`/api/chat/users/search?q=${encodeURIComponent(q)}`),
+
+  /** GET /api/chat/conversations — list my conversations */
+  listConversations: () => request('/api/chat/conversations'),
+
+  /**
+   * POST /api/chat/conversations — find or create a direct conversation
+   * @param {string} other_user_id
+   */
+  openConversation: (other_user_id) =>
+    request('/api/chat/conversations', { method: 'POST', body: JSON.stringify({ other_user_id }) }),
+
+  /**
+   * GET /api/chat/conversations/:id/messages — paginated history
+   * @param {string} conversationId
+   * @param {{ limit?, before? }} opts
+   */
+  getMessages: (conversationId, { limit, before } = {}) => {
+    const params = new URLSearchParams()
+    if (limit) params.set('limit', limit)
+    if (before) params.set('before', before)
+    const qs = params.toString()
+    return request(`/api/chat/conversations/${conversationId}/messages${qs ? `?${qs}` : ''}`)
+  },
+}
+
 // ── Media / Cloudinary upload endpoints ──────────────────────────────────────
 
 export const mediaApi = {

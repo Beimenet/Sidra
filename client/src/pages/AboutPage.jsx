@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import aboutPic from '../assets/about pic.PNG'
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -140,10 +141,15 @@ export default function AboutPage() {
 
             {/* Right — stat grid */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Hero image placeholder */}
-              <div className="col-span-2 relative rounded-2xl overflow-hidden bg-sage/20 aspect-video flex items-end p-5">
+              {/* Hero image */}
+              <div className="col-span-2 relative rounded-2xl overflow-hidden aspect-video">
+                <img
+                  src={aboutPic}
+                  alt="Ethiopian family together — Sidra guidance for every family"
+                  className="w-full h-full object-cover"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 to-transparent" aria-hidden="true" />
-                <p className="relative text-white text-sm font-semibold leading-snug max-w-sm">
+                <p className="absolute bottom-0 left-0 right-0 p-5 text-white text-sm font-semibold leading-snug max-w-sm">
                   Bridging the generations and wisdom of wise elders with evidence-based science.
                 </p>
               </div>

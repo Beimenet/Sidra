@@ -14,6 +14,13 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
+      // Forward Socket.IO long-polling requests through Vite's proxy.
+      // WebSocket upgrades connect directly to VITE_SOCKET_URL (default: http://localhost:5000).
+      '/socket.io': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        ws: true,
+      },
     },
   },
 })
