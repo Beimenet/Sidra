@@ -1,5 +1,9 @@
+
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://sidra-api-or0n.onrender.com/api/:path*"
+    }
   ]
 }
