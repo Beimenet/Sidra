@@ -26,6 +26,11 @@ export const env = {
   NODE_ENV: optional('NODE_ENV', 'development'),
 
   // â”€â”€ CORS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── CORS ──────────────────────────────────────────────────────────────────────
+  // Comma-separated list of allowed origins.
+  //   development:  http://localhost:5173
+  //   production:   https://sidra-pi-one.vercel.app
+  //   both:         https://sidra-pi-one.vercel.app,http://localhost:5173
   CLIENT_ORIGIN: optional('CLIENT_ORIGIN', 'http://localhost:5173'),
 
   // â”€â”€ Database â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

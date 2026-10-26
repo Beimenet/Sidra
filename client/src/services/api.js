@@ -4,14 +4,17 @@
  * All requests include credentials: 'include' so the browser sends and
  * receives the HttpOnly session cookie automatically.
  *
- * The Vite dev proxy forwards /api/* to http://localhost:5000, so no
- * hard-coded base URL is needed for development.
+ * Development:
+ *   The Vite dev proxy forwards /api/* to http://localhost:5000, so
+ *   VITE_API_URL can be left unset (BASE defaults to '').
  *
- * In production, set VITE_API_BASE in the client .env if the API lives
- * on a different origin (e.g. https://api.sidra.et).
+ * Production (Vercel frontend → Render backend):
+ *   Set VITE_API_URL=https://sidra-api-or0n.onrender.com in Vercel's
+ *   environment variable settings.  The cookie will be sent cross-origin
+ *   because the backend sets SameSite=None; Secure in production.
  */
 
-const BASE = import.meta.env.VITE_API_BASE ?? ''
+const BASE = import.meta.env.VITE_API_URL ?? import.meta.env.VITE_API_BASE ?? ''
 
 /**
  * Core request helper.

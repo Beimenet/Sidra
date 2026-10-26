@@ -56,13 +56,13 @@ function parseSidCookie(cookieHeader) {
  * Call this AFTER app.listen() returns an http.Server instance.
  *
  * @param {import('http').Server} httpServer
- * @param {string} clientOrigin — e.g. "http://localhost:5173"
+ * @param {string | string[]} allowedOrigins — one URL or an array (e.g. ["https://sidra-pi-one.vercel.app","http://localhost:5173"])
  * @returns {import('socket.io').Server}
  */
-export function initSocket(httpServer, clientOrigin) {
+export function initSocket(httpServer, allowedOrigins) {
   const io = new Server(httpServer, {
     cors: {
-      origin: clientOrigin,
+      origin: allowedOrigins,   // Socket.IO accepts a string or string[]
       credentials: true,
       methods: ['GET', 'POST'],
     },

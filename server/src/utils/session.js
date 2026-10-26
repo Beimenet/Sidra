@@ -12,7 +12,7 @@ import { env } from '../config/env.js'
 
 /** Session lifetime in seconds (default 7 days). */
 const DURATION_DAYS = Number(env.SESSION_DURATION_DAYS ?? 7)
-const DURATION_MS   = DURATION_DAYS * 24 * 60 * 60 * 1000
+const DURATION_MS = DURATION_DAYS * 24 * 60 * 60 * 1000
 
 /** Cookie name — non-descriptive to avoid leaking implementation details. */
 export const COOKIE_NAME = 'sid'
@@ -22,11 +22,16 @@ export const COOKIE_NAME = 'sid'
  * Secure is enabled only in production (HTTPS required).
  */
 export function cookieOptions(maxAge = DURATION_MS) {
+  const isProd = env.NODE_ENV === 'production'
   return {
     httpOnly: true,
-    sameSite: 'lax',
-    secure:   env.NODE_ENV === 'production',
-    path:     '/',
+    // Cross-origin production deployment (Vercel frontend → Render backend):
+    // The browser only sends cookies to a different origin when both
+    // SameSite=None AND Secure are set.  In development (same origin via Vite
+    // proxy) 'lax' is fine; in production we must use 'none'.
+    sameSite: isProd ? 'none' : 'lax',
+    secure: isProd,   // SameSite=None requires Secure — both must be true
+    path: '/',
     maxAge,           // milliseconds
   }
 }
@@ -46,7 +51,7 @@ function generateSessionId() {
  * @returns {Promise<string>} session ID to store in the cookie
  */
 export async function createSession(userId, { ip = null, userAgent = null } = {}) {
-  const id        = generateSessionId()
+  const id = generateSessionId()
   const expiresAt = new Date(Date.now() + DURATION_MS)
 
   await pool.query(

@@ -39,11 +39,27 @@ import { errorHandler } from './middleware/errorHandler.js'
 const app = express()
 const httpServer = createServer(app)   // wrap Express in a plain HTTP server
 
-// ── Global middleware ─────────────────────────────────────────────────────────
+// ── CORS ──────────────────────────────────────────────────────────────────────
+// CLIENT_ORIGIN accepts a comma-separated list of allowed origins so the same
+// backend serves both the local Vite dev server and the deployed Vercel frontend.
+//
+//   development:  CLIENT_ORIGIN=http://localhost:5173
+//   production:   CLIENT_ORIGIN=https://sidra-pi-one.vercel.app
+//   both:         CLIENT_ORIGIN=https://sidra-pi-one.vercel.app,http://localhost:5173
+
+const ALLOWED_ORIGINS = env.CLIENT_ORIGIN
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean)
 
 app.use(cors({
-  origin: env.CLIENT_ORIGIN,
-  credentials: true,
+  origin: (origin, callback) => {
+    // Allow requests with no Origin (server-to-server, curl, Render health checks)
+    if (!origin) return callback(null, true)
+    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true)
+    callback(new Error(`CORS: origin '${origin}' is not allowed.`))
+  },
+  credentials: true,   // required so the browser sends the HttpOnly sid cookie
 }))
 
 app.use(cookieParser())
@@ -82,7 +98,9 @@ app.use(notFound)
 app.use(errorHandler)
 
 // ── Attach Socket.IO ──────────────────────────────────────────────────────────
-initSocket(httpServer, env.CLIENT_ORIGIN)
+// Pass the full allowed-origins array so Socket.IO uses the same CORS policy
+// as Express (supports both dev localhost and production Vercel URL).
+initSocket(httpServer, ALLOWED_ORIGINS)
 
 // ── Start server ──────────────────────────────────────────────────────────────
 const PORT = Number(env.PORT)
