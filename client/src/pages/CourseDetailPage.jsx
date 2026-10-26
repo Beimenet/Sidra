@@ -350,25 +350,24 @@ export default function CourseDetailPage() {
                 {course.fullDescription}
               </p>
 
-              {/* Meta strip */}
               <div className="mt-6 flex flex-wrap gap-5 text-sm text-warm-gray">
                 <span className="flex items-center gap-1.5">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0118 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                   </svg>
-                  {totalLessons} lessons across {course.modules.length} modules
+                  {totalLessons} lessons{modules.length > 0 ? ` across ${modules.length} modules` : ''}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  {course.duration} total
+                  {course.duration ?? '—'} total
                 </span>
                 <span className="flex items-center gap-1.5">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                   </svg>
-                  {course.instructor}
+                  {course.instructor ?? 'Sidra Instructor'}
                 </span>
               </div>
             </div>
@@ -420,9 +419,9 @@ export default function CourseDetailPage() {
                 <ul className="flex flex-col gap-2.5 text-sm text-charcoal">
                   <li className="flex items-start gap-2"><CheckIcon /><span>{totalLessons} lessons</span></li>
                   <li className="flex items-start gap-2"><CheckIcon /><span>{course.duration} of content</span></li>
-                  <li className="flex items-start gap-2"><CheckIcon /><span>{course.format} format</span></li>
-                  <li className="flex items-start gap-2"><CheckIcon /><span>{course.level} level</span></li>
-                  {course.resources.length > 0 && (
+                  <li className="flex items-start gap-2"><CheckIcon /><span>{course.format ?? 'Mixed'} format</span></li>
+                  <li className="flex items-start gap-2"><CheckIcon /><span>{course.level ?? 'Beginner'} level</span></li>
+                  {(course.resources?.length ?? 0) > 0 && (
                     <li className="flex items-start gap-2"><CheckIcon /><span>{course.resources.length} external resources</span></li>
                   )}
                 </ul>
@@ -450,47 +449,53 @@ export default function CourseDetailPage() {
           </section>
 
           {/* What you'll learn */}
-          <section aria-labelledby="objectives-heading">
-            <h2 id="objectives-heading" className="text-xl font-bold text-charcoal mb-4">
-              What You Will Learn
-            </h2>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {course.objectives.map((obj, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-charcoal leading-snug">
-                  <CheckIcon />
-                  <span>{obj}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+          {(course.objectives?.length ?? 0) > 0 && (
+            <section aria-labelledby="objectives-heading">
+              <h2 id="objectives-heading" className="text-xl font-bold text-charcoal mb-4">
+                What You Will Learn
+              </h2>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {course.objectives.map((obj, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-charcoal leading-snug">
+                    <CheckIcon />
+                    <span>{obj}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           {/* Who this is for */}
-          <section aria-labelledby="audience-heading">
-            <h2 id="audience-heading" className="text-xl font-bold text-charcoal mb-3">
-              Who This Course Is For
-            </h2>
-            <p className="text-warm-gray leading-relaxed text-sm">{course.audience}</p>
-          </section>
+          {course.audience && (
+            <section aria-labelledby="audience-heading">
+              <h2 id="audience-heading" className="text-xl font-bold text-charcoal mb-3">
+                Who This Course Is For
+              </h2>
+              <p className="text-warm-gray leading-relaxed text-sm">{course.audience}</p>
+            </section>
+          )}
 
           {/* Curriculum */}
-          <section aria-labelledby="curriculum-heading">
-            <div className="flex items-center justify-between mb-4">
-              <h2 id="curriculum-heading" className="text-xl font-bold text-charcoal">
-                Course Curriculum
-              </h2>
-              <span className="text-xs text-warm-gray">
-                {course.modules.length} modules · {totalLessons} lessons · {course.duration}
-              </span>
-            </div>
-            <div className="flex flex-col gap-3">
-              {course.modules.map((module, i) => (
-                <ModuleAccordion key={module.id} module={module} defaultOpen={i === 0} />
-              ))}
-            </div>
-          </section>
+          {modules.length > 0 && (
+            <section aria-labelledby="curriculum-heading">
+              <div className="flex items-center justify-between mb-4">
+                <h2 id="curriculum-heading" className="text-xl font-bold text-charcoal">
+                  Course Curriculum
+                </h2>
+                <span className="text-xs text-warm-gray">
+                  {modules.length} modules · {totalLessons} lessons · {course.duration ?? '—'}
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {modules.map((module, i) => (
+                  <ModuleAccordion key={module.id} module={module} defaultOpen={i === 0} />
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* External resources */}
-          {course.resources.length > 0 && (
+          {(course.resources?.length ?? 0) > 0 && (
             <section aria-labelledby="resources-heading">
               <h2 id="resources-heading" className="text-xl font-bold text-charcoal mb-2">
                 Additional Learning Resources
