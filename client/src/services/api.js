@@ -10,11 +10,26 @@
  *
  * Production (Vercel frontend → Render backend):
  *   Set VITE_API_URL=https://sidra-api-or0n.onrender.com in Vercel's
- *   environment variable settings.  The cookie will be sent cross-origin
- *   because the backend sets SameSite=None; Secure in production.
+ *   Environment Variables dashboard (Settings → Environment Variables).
+ *   The cookie is sent cross-origin because the backend uses SameSite=None; Secure.
  */
 
-const BASE = import.meta.env.VITE_API_URL ?? import.meta.env.VITE_API_BASE ?? ''
+// Vite bakes this value into the bundle at build time.
+// In production VITE_API_URL must be set; fall back to '' only in dev
+// where the Vite proxy handles /api/* on the same origin.
+const BASE = import.meta.env.VITE_API_URL ?? ''
+
+// Warn loudly at startup if the app is running in a production-like context
+// but VITE_API_URL was never set (the build would silently send all API
+// requests to the frontend's own domain and receive 404s).
+if (!import.meta.env.VITE_API_URL && import.meta.env.PROD) {
+  console.error(
+    '[api] VITE_API_URL is not set.\n' +
+    'All API requests will fail (404).\n' +
+    'Set VITE_API_URL=https://sidra-api-or0n.onrender.com in Vercel → ' +
+    'Project Settings → Environment Variables, then redeploy.'
+  )
+}
 
 /**
  * Core request helper.
