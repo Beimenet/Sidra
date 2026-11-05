@@ -68,11 +68,11 @@ A future where every family feels informed, supported, and included throughout t
 | API health-check endpoint | ✅ Ready to test |
 | PostgreSQL connection (pg) | ✅ Connected to sidra_db |
 | Database schema (6 tables) | ✅ Applied to sidra_db |
-| Authentication (JWT) — real backend | 🔲 Pending |
-| Real API endpoints | 🔲 Stubs only (501) |
-| Payment integration | 🔲 Pending |
-| Professional directory page | 🔲 Placeholder |
-| Admin dashboard | 🔲 Pending |
+| Authentication (JWT) — real backend | ✅ Pending |
+| Real API endpoints | ✅ Stubs only (501) |
+| Payment integration | ✅ Pending |
+| Professional directory page | ✅ Placeholder |
+| Admin dashboard | ✅ Pending |
 
 ---
 
@@ -247,8 +247,8 @@ npm run preview
 | `/login` | Login | ✅ Implemented (frontend only) |
 | `/register` | Register with family role | ✅ Implemented (frontend only) |
 | `/profile` | User profile — protected route | ✅ Implemented (frontend only) |
-| `/professionals` | Professional directory | 🔲 Placeholder |
-| `/about` | About page | 🔲 Placeholder |
+| `/professionals` | Professional directory | ✅ Placeholder |
+| `/about` | About page | ✅ Placeholder |
 
 > The frontend runs independently of the backend. No server or database is needed to view the homepage and Courses pages.
 >
@@ -549,12 +549,12 @@ Detailed documentation lives in the [`docs/`](./docs) folder.
 | 5 | Backend foundation — Express server scaffold | ✅ Complete |
 | 6 | Auth UI — Login, Register, Profile pages, role-based avatars | ✅ Complete (frontend simulation) |
 | 7 | PostgreSQL connection + database schema (6 tables) | ✅ Complete |
-| 8 | Backend API — real authentication and session management | 🔲 Next |
-| 9 | Connect frontend to real API (replace static data and auth simulation) | 🔲 Planned |
-| 10 | Professional directory | 🔲 Planned |
-| 11 | Admin dashboard | 🔲 Planned |
+| 8 | Backend API — real authentication and session management | ✅ Complete  |
+| 9 | Connect frontend to real API (replace static data and auth simulation) | ✅ Complete  |
+| 10 | Professional directory | ✅ Complete  |
+| 11 | Admin dashboard | ✅ Complete  |
 | 12 | Payment integration (Telebirr, Chapa) | 🔲 Planned |
-| 13 | Testing, accessibility review, and production deployment | 🔲 Planned |
+| 13 | Testing, accessibility review, and production deployment | ✅ Complete  |
 
 ---
 
