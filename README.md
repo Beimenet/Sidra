@@ -4,6 +4,11 @@
 
 **"ቤተሰብ ማለት ሀገር ነው፤ ቤተሰብን ማስተማር ሀገርን ማስተማር ነው።"**
 
+
+Members
+Name                        ID
+1. Amanuel Yimer           CTC-2183-26
+2. Beimenet Sisay          CTC-2274-26
 ---
 
 ## Table of Contents
