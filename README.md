@@ -10,6 +10,8 @@ Name                        ID
 1. Amanuel Yimer           CTC-2183-26
 2. Beimenet Sisay          CTC-2274-26
 ---
+Video Description: https://drive.google.com/drive/folders/15439X1_a2pcbOexqLozEMAJn2tqmBIS-?usp=drive_link
+---
 
 ## Table of Contents
 
